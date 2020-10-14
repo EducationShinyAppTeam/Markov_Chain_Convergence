@@ -5,7 +5,6 @@ library(shinyBS)
 library(boastUtils)
 library(shinyWidgets)
 library(shinyMatrix)
-library(matrixcalc)
 library(shinyjs)
 library(ggplot2)
 library(tidyr)
@@ -17,7 +16,6 @@ APP_DESCP  <<- paste(
   "by considering multiple sample problems."
 )
 # End App Meta Data------------------------------------------------------------
-
 
 # Function for showing the check or X based on a condition
 # Input: boolean for whether the condition is true or false
@@ -82,7 +80,7 @@ ui <- list(
                     context and see how quickly these probabilities converge to 
                     long run behavior.")
           ),
-          ##### Go Button--location will depend on your goals
+          ##### Go Button
           div(
             style = "text-align: center",
             bsButton(
@@ -91,68 +89,44 @@ ui <- list(
               size = "large",
               icon = icon("bolt")
             )
-          ),
-          ##### Create two lines of space
-          br(),
-          br()
-          
-        ),
-        #### Set up the Prerequisites Page CURRENTLY NOT IMPLEMENTED!!!!!
-        tabItem(
-          tabName = "Prerequisites",
-          withMathJax(),
-          h2("Prerequisites"),
-          p("In order to get the most out of this app, please review the
-            following:"),
-          tags$ul(
-            tags$li("The definition of discrete time Markov chains"),
-            tags$li("Representing discrete time Markov chains using probability 
-                    matrices"),
-            tags$li("Theory of long run behavior and behavior n steps from now 
-                    (some of which should probably be in explore...)")
-            
           )
-          
         ),
-        #### Note: you must have at least one of the following pages. You might
-        #### have more than one type and/or more than one of the same type. This
-        #### will be up to you and the goals for your app.
+
         #### Set up an Explore Page
         tabItem(
           tabName = "Explore",
           withMathJax(),
-          h2("Explore Discrete Time Markov Chains and Their Long Run Distributions"),
+          h2("Explore Discrete Time Markov Chains and Their Long Run Behavior"),
           p("In this section, you will explore the behavior of Discrete Time 
             Markov chains over time and their behavior in the long run."),
-          
-          #h2("Calculating Markov Chain Future Behavior"),
           p(
             "Below you are given a calculator to help you understand the long run
             behavior. To use the calculator, you should first choose a size for 
             your probability matrix then fill in the transition probabilities. 
             Note that since this is a probability matrix, the rows must sum to 1. 
-            You also can choose an initial state. You can then view either a bar
-            graph of a simulated run of n steps or view the matrix n steps out, i.e.
+            The Number of Steps allows you to choose how many steps in the future
+            to consider the matrix, i.e. the calculator with take your probability
             to the nth power."
           ),
           p(
             "Use the calculator to answer the problems for each scenario. To 
             generate new numbers for the problem, click the new problem button.
-            Notice how quickly the chain approaches long run behavior in each problem."
+            Notice the rate at which the chain approaches long run behavior in each 
+            problem."
           ),
           
           fluidRow(
             # Title
             titlePanel("Transition Probability Calculator"),
-            #tags$style(type="text/css", "#view tr:last-child {font-weight:bold;}"),
-            
-            
             sidebarLayout(
               sidebarPanel(
                 # Input for number of rows in the matrix
-                selectInput("nrows", "Number of States in the Matrix:", c(2,3,4,5), 2),
+                selectInput("nrows", 
+                            "Number of States in the Matrix:", 
+                            c(2,3,4,5), 2),
                 
-                # Input to select current state of the matrix conditional on the matrix size
+                # Input to select current state of the matrix conditional on the 
+                # matrix size
                 conditionalPanel(
                   condition = "input.nrows == 2", 
                   matrixInput("ogMat2", matrix(diag(2), 
@@ -160,11 +134,7 @@ ui <- list(
                                                dimnames = list(0:1, 0:1)), 
                               rows = list(names = TRUE), 
                               cols = list( names = TRUE), 
-                              class = "numeric"),
-                  # selectInput("curState2", 
-                  #             "Current State of the Matrix", 
-                  #             choices = 0:1, 
-                  #             selected = 0)
+                              class = "numeric")
                   ),
                 conditionalPanel(
                   condition = "input.nrows == 3",
@@ -172,11 +142,7 @@ ui <- list(
                               matrix(diag(3), nrow=3, dimnames = list(0:2, 0:2)), 
                               rows = list(names = TRUE), 
                               cols = list( names = TRUE), 
-                              class = "numeric"),
-                  # selectInput("curState3", 
-                  #             "Current State of the Matrix", 
-                  #             choices = 0:2, 
-                  #             selected = 0)
+                              class = "numeric")
                 ),
                 conditionalPanel(
                   condition = "input.nrows == 4",
@@ -184,11 +150,7 @@ ui <- list(
                               matrix(diag(4), nrow=4, dimnames = list(0:3, 0:3)), 
                               rows = list(names = TRUE),
                               cols = list( names = TRUE), 
-                              class = "numeric" ),
-                  # selectInput("curState4", 
-                  #             "Current State of the Matrix", 
-                  #             choices = 0:3, 
-                  #             selected = 0)
+                              class = "numeric" )
                 ),
                 conditionalPanel(
                   condition = "input.nrows == 5",
@@ -196,11 +158,7 @@ ui <- list(
                               matrix(diag(5), nrow=5, dimnames = list(0:4, 0:4)), 
                               rows = list(names = TRUE), 
                               cols = list( names = TRUE), 
-                              class = "numeric" ),
-                  # selectInput("curState5", 
-                  #             "Current State of the Matrix", 
-                  #             choices = 0:4, 
-                  #             selected = 0)
+                              class = "numeric" )
                 ),
                 conditionalPanel(
                   condition = "input.nrows > 5 | input.nrows < 2",
@@ -214,28 +172,18 @@ ui <- list(
                              max = 10000, 
                              value = 1, 
                              step = 1),
-                actionButton("subMat", "Calculate Matrix"),
-                # actionButton("runSteps", "Plot Steps")
+                actionButton("subMat", "Calculate Matrix")
               ),
               
               # Outputs: plot of states visited and the matrix to the n-steps power
               mainPanel(
                 conditionalPanel(
                   condition = "!input.subMat",
-                  p("To see the matrix x steps out, click the Calculate Matrix button.")
+                  p("To see the matrix x steps out, click the Calculate Matrix 
+                    button.")
                 ),
-                # conditionalPanel(
-                #   condition = "!input.runSteps",
-                #   p("To see a graph of the simulation, click the Plot Steps button.")
-                # ),
                 textOutput("matlabel"),
-                tableOutput("mat"),
-                # plotOutput("plot", height="250px"),
-                # textOutput("proportions"),
-                # textOutput("longRun")
-                #textOutput("matlabel")
-                #tableOutput("outmattemp") #Is a table that shows the number of elements for each component of the bar graph for testing purposes
-                
+                tableOutput("mat")
               )
             )
             ),
@@ -244,27 +192,29 @@ ui <- list(
                title = "Candy",
           h2("Candy or Cookies"),
           textOutput("candyProb"),
+          br(),
           fluidRow(
             column(
               width = 5,
-          
-            
               fluidRow(
                 column(width = 10, 
-              numericInput(inputId = "child1Prob", 
-                           label = "Probability that the first child chooses candy", 
-                           value = NA,
-                           min = 0,
-                           max = 1)
+              numericInput(
+                inputId = "child1Prob", 
+                label = "Probability that the next child chooses candy", 
+                value = NA,
+                min = 0,
+                max = 1)
               ),
               column(width = 2, br(), uiOutput("correctnessChild1"))),
               fluidRow(
-                column(width = 10, 
-                       numericInput(inputId = "child5Prob", 
-                                    label = "Probability that the fifth child chooses candy", 
-                                    value = NA,
-                                    min = 0,
-                                    max = 1)
+                column(
+                  width = 10, 
+                  numericInput(
+                    inputId = "child5Prob", 
+                    label = "Probability that the fifth child chooses candy", 
+                    value = NA,
+                    min = 0,
+                    max = 1)
                 ),
                 column(width = 2, br(), uiOutput("correctnessChild5"))),
               fluidRow(
@@ -276,22 +226,23 @@ ui <- list(
                            max = 1)),
               column(width = 2, br(), uiOutput("correctnessChild10"))),
               fluidRow(
-                column(width = 10, 
-              numericInput(inputId = "child20Prob", 
-                           label = "Probability that the last child chooses candy", 
-                           value = NA,
-                           min = 0,
-                           max = 1)),
-                       column(width = 2, br(), uiOutput("correctnessChild20"))),
+                column(
+                  width = 10, 
+                  numericInput(
+                    inputId = "child20Prob", 
+                    label = "Probability that the last child chooses candy", 
+                    value = NA,
+                    min = 0,
+                    max = 1)),
+                column(width = 2, br(), uiOutput("correctnessChild20"))),
               
-            
           actionButton("checkCandy", "Check Answer"),
           actionButton("newCandy", "New Problem")),
           column(width = 7,
                  checkboxInput("showCandyPlots", "Show sample candy plots"),
                  conditionalPanel( 
                    condition = "input.showCandyPlots",
-                   plotOutput("candyDaily", height = '250px'),    
+                   plotOutput("candyDaily", height = '250px'),  
                    plotOutput("candyCumulativeProb", height = '300px'),
                    actionButton("newCandyPlotSamples", "New Sample"))
                  )
@@ -302,11 +253,6 @@ ui <- list(
             h2("Traffic Lights"),
             textOutput("lightProb"),
             br(),
-            # p("There are seven streetlights on a busy street you drive down each 
-            #   day that are timed so that the probability that a light is red is 
-            #   0.3 if the previous light was red when you arrived at it and 0.9 
-            #   if the previous light was not red.  Also, the chance that the first 
-            #   light you come to is red is 0.1. "),
             fluidRow(
               column(width = 4,
                      numericInput(inputId = "TLG1", 
@@ -323,20 +269,22 @@ ui <- list(
                                   max = 1)),
               column(width = 1, br(), uiOutput("correctnessLR1"))),
             fluidRow(  
-              column(width = 4,
-                     numericInput(inputId = "TLG5", 
-                                  label = "Probability of Fifth Light from Now Green", 
-                                  value = NA,
-                                  min = 0,
-                                  max = 1)
+              column(
+                width = 4,
+                numericInput(inputId = "TLG5", 
+                             label = "Probability of Fifth Light from Now Green", 
+                             value = NA,
+                             min = 0,
+                             max = 1)
                      ),
               column(width = 1, br(), uiOutput("correctnessLG5")),
-              column(width = 4,
-                     numericInput(inputId = "TLR5", 
-                                  label = "Probability of Fifth Light from Now Red", 
-                                  value = NA,
-                                  min = 0,
-                                  max = 1)),
+              column(
+                width = 4,
+                numericInput(inputId = "TLR5", 
+                             label = "Probability of Fifth Light from Now Red", 
+                             value = NA,
+                             min = 0,
+                             max = 1)),
               column(width = 1, br(), uiOutput("correctnessLR5"))
             ),
             fluidRow(  
@@ -361,7 +309,7 @@ ui <- list(
             checkboxInput("showLightPlots", "Show sample light plots"),
             conditionalPanel( 
               condition = "input.showLightPlots",
-              plotOutput("lightDaily", height = '250px'),    
+              plotOutput("lightDaily", height = '250px'),  
               plotOutput("lightCumulativeProb", height = '300px'),
               actionButton("newLightPlotSamples", "New Sample"))
           ),
@@ -369,63 +317,78 @@ ui <- list(
             title = "Weather",
             h2("Rain or No Rain"),
             textOutput("weatherProb"),
-            p("Today, it rained. Calculate the probability that it will rain each of the following days."),
+            p("Today, it rained. Calculate the probability that it will rain 
+              each of the following days."),
             fluidRow(
               column(width = 5,
                          fluidRow(
-                           column(width = 10, 
-                                  numericInput(inputId = "tomorrowProb1", 
-                                               label = "Probability of Rain Tomorrow", 
-                                               value = NA,
-                                               min = 0,
-                                               max = 1)
+                           column(
+                             width = 10, 
+                             numericInput(inputId = "tomorrowProb1", 
+                                          label = "Probability of Rain Tomorrow", 
+                                          value = NA,
+                                          min = 0,
+                                          max = 1)
                            ),
                            column(width = 2, br(), uiOutput("correctnessW1"))),
                          fluidRow(
-                           column(width = 10, 
-                                  numericInput(inputId = "weekProb1", 
-                                               label = "Probability of Rain One Week from Now", 
-                                               value = NA,
-                                               min = 0,
-                                               max = 1)),
+                           column(
+                             width = 10, 
+                                  numericInput(
+                                    inputId = "weekProb1", 
+                                    label = "Probability of Rain One Week from Now", 
+                                    value = NA,
+                                    min = 0,
+                                    max = 1)),
                            column(width = 2, br(), uiOutput("correctnessW2"))),
-                         fluidRow(
-                           column(width = 10, 
-                                  numericInput(inputId = "monthProb1", 
-                                               label = "Probability of Rain One Month from Now", 
-                                               value = NA,
-                                               min = 0,
-                                               max = 1)),
-                           column(width = 2, br(), uiOutput("correctnessW3"))),
-                         fluidRow(
-                           column(width = 10, 
-                                  numericInput(inputId = "yearProb1", 
-                                               label = "Probability of Rain One Year from Now", 
-                                               value = NA,
-                                               min = 0,
-                                               max = 1)),
-                           
-                           column(width = 2, br(), uiOutput("correctnessW4"))),
-                         
+                     fluidRow(
+                       column(
+                         width = 10, 
+                         numericInput(
+                           inputId = "monthProb1", 
+                           label = "Probability of Rain One Month from Now", 
+                           value = NA,
+                           min = 0,
+                           max = 1)),
+                       column(width = 2, br(), uiOutput("correctnessW3"))),
+                     fluidRow(
+                       column(
+                         width = 10, 
+                         numericInput(
+                           inputId = "yearProb1", 
+                           label = "Probability of Rain One Year from Now", 
+                           value = NA,
+                           min = 0,
+                           max = 1)),
+                       
+                       column(width = 2, br(), uiOutput("correctnessW4"))),
+                     
                      actionButton("checkGame", "Check Answer"),
                      actionButton("newWeather", "New Problem")),
-              column(width = 6,
-                     checkboxInput("showWeatherPlots", "Show sample weather plots"),
-                     conditionalPanel( 
-                       condition = "input.showWeatherPlots",
-                       plotOutput("weatherDaily", height = '250px'),    
-                       plotOutput("weatherCumulativeProb", height = '300px'),
-                       actionButton("newWeatherPlotSamples", "New Sample"))
+              column(
+                width = 6,
+                checkboxInput("showWeatherPlots", "Show sample weather plots"),
+                conditionalPanel( 
+                  condition = "input.showWeatherPlots",
+                  plotOutput("weatherDaily", height = '250px'),   
+                  plotOutput("weatherCumulativeProb", height = '300px'),
+                  actionButton("newWeatherPlotSamples", "New Sample"))
               )
             )
             ))),
 
 
-        #### Set up the References Page-REQUIRED
+        #### Set up the References Page
         tabItem(
           tabName = "References",
           withMathJax(),
           h2("References"),
+          p(
+            class = "hangingindent", 
+            "Attali, D. (2020), shinyjs: Easily Improve the User Experience of 
+            Your Shiny Apps in Seconds, R package. Available from  
+            https://CRAN.R-project.org/package=shinyjs"
+          ), 
           p(
             class = "hangingindent",
             "Bailey, E. (2015), shinyBS: Twitter bootstrap components for shiny, 
@@ -456,16 +419,21 @@ ui <- list(
           ), 
           p(
             class = "hangingindent",
-            "Novomestky, F. (2012), matrixcalc: Collection
-  of functions for matrix calculations, R package. Available from
-            https://CRAN.R-project.org/package=matrixcalc"
-          ),
-          p(
-            class = "hangingindent",
             "Perrier, V., Meyer, F., and Granjon, D. (2020), shinyWidgets: Custom 
             Inputs Widgets for Shiny, R package. Available from
             https://CRAN.R-project.org/package=shinyWidgets"
-          )
+          ),
+          p(
+            class = "hangingindent",
+            "Wickham, H. and Lionel, H. (2020), tidyr: Tidy Messy Data, R package.
+            Available from https://CRAN.R-project.org/package=tidyr"
+            ),
+          p(
+            class = "hangingindent",
+            "Wickham, W. (2016), ggplot2: Elegant graphics for data analysis,
+            R Package. Springer-Verlag New York. Available from
+            https://ggplot2.tidyverse.org"
+          ),
         )
       )
     )
@@ -475,6 +443,7 @@ ui <- list(
 # Define server logic
 
 server<-function(input, output, session) {
+  # Code for instructions (i) button
   observeEvent(input$info,{
     sendSweetAlert(
       session = session,
@@ -487,14 +456,17 @@ server<-function(input, output, session) {
     )
   })
   
+  # Handles verification that the entered matrix is a probability matrix for 2x2 
   ogMat2 <- reactive({
    validate(
-      need(min(input$ogMat2)>=0 && sum(input$ogMat2[1,])==1 && sum(input$ogMat2[2,])==1, 
+      need(min(input$ogMat2)>=0 && sum(input$ogMat2[1,])==1 && 
+             sum(input$ogMat2[2,])==1, 
            "Rows must be non-negative and sum to 1")
       )
     input$ogMat2
   })
   
+  # Handles verification that the entered matrix is a probability matrix for 3x3 
   ogMat3 <- reactive({
     validate(
       need(min(input$ogMat3)>=0 && sum(input$ogMat3[1,])==1 && 
@@ -504,6 +476,7 @@ server<-function(input, output, session) {
     input$ogMat3
   })
   
+  # Handles verification that the entered matrix is a probability matrix for 4x4 
   ogMat4 <- reactive({
     validate(
       need(min(input$ogMat4)>=0 && sum(input$ogMat4[1,])==1 && 
@@ -514,6 +487,7 @@ server<-function(input, output, session) {
     input$ogMat4
   })
   
+  # Handles verification that the entered matrix is a probability matrix for 5x5
   ogMat5 <- reactive({
     validate(
       need(min(input$ogMat5)>=0 && sum(input$ogMat5[1,])==1 && 
@@ -524,24 +498,7 @@ server<-function(input, output, session) {
     input$ogMat5
   })
   
-  matSteps <- function(start, steps, size, mat){
-    curState <- start
-    totals<-matrix(rep(0,25), nrow=5)
-    for(x in 1:steps){
-      curState <- sample(0:(size-1), 1, replace=TRUE, prob=mat[curState+1,])
-      # if(as.numeric(input$nrows)==2){
-      #   curState<-sample(0:(as.numeric(input$nrows)-1), 1, replace=TRUE, prob=ogMat2()[curState+1,])}
-      # else if(as.numeric(input$nrows)==3){
-      #   curState<-sample(0:(as.numeric(input$nrows)-1), 1, replace=TRUE, prob=ogMat3()[curState+1,])}
-      # else if(as.numeric(input$nrows)==4){
-      #   curState<-sample(0:(as.numeric(input$nrows)-1), 1, replace=TRUE, prob=ogMat4()[curState+1,])} 
-      # else if(as.numeric(input$nrows)==5){
-      #   curState<-sample(0:(as.numeric(input$nrows)-1), 1, replace=TRUE, prob=ogMat5()[curState+1,])}
-      totals[as.numeric(input$nrows)-1, curState+1]<-totals[as.numeric(input$nrows)-1, curState+1]+1
-    }
-    totals[as.numeric(input$nrows)-1,1:as.numeric(input$nrows)]
-  }
-  
+  # Gets the current probability matrix for the calculator based on number of rows
   getCurrentMatrix <- reactive({
     if(as.numeric(input$nrows)==2){
         ogMat2()
@@ -557,51 +514,13 @@ server<-function(input, output, session) {
     }
   })
   
-  
-  runSteps<-eventReactive(input$runSteps,{
-    # curState<-as.numeric(input$curState2) 
-    # for(x in 1:input$steps){
-      if(as.numeric(input$nrows)==2){
-        matSteps(start = as.numeric(input$curState2), 
-                 steps = input$steps, 
-                 size = as.numeric(input$nrows),
-                 mat = ogMat2())
-      }
-    else if(as.numeric(input$nrows)==3){
-      matSteps(start = as.numeric(input$curState3), 
-               steps = input$steps, 
-               size = as.numeric(input$nrows), 
-               mat = ogMat3())
-    }
-    else if(as.numeric(input$nrows)==4){
-      matSteps(start = as.numeric(input$curState4), 
-               steps = input$steps, 
-               size = as.numeric(input$nrows), 
-               mat = ogMat4())
-    }
-    else{
-      matSteps(start = as.numeric(input$curState5), 
-               steps = input$steps, 
-               size = as.numeric(input$nrows), 
-               mat = ogMat5())
-    }
-        # curState<-sample(0:(as.numeric(input$nrows)-1), 1, replace=TRUE, prob=ogMat2()[curState+1,])}
-      # else if(as.numeric(input$nrows)==3){
-      #   curState<-sample(0:(as.numeric(input$nrows)-1), 1, replace=TRUE, prob=ogMat3()[curState+1,])}
-      # else if(as.numeric(input$nrows)==4){
-      #   curState<-sample(0:(as.numeric(input$nrows)-1), 1, replace=TRUE, prob=ogMat4()[curState+1,])} 
-      # else if(as.numeric(input$nrows)==5){
-      #   curState<-sample(0:(as.numeric(input$nrows)-1), 1, replace=TRUE, prob=ogMat5()[curState+1,])}
-    #   totals[as.numeric(input$nrows)-1, curState+1]<-totals[as.numeric(input$nrows)-1, curState+1]+1
-    # }
-    # totals[as.numeric(input$nrows)-1,1:as.numeric(input$nrows)]
-  })
-  
-  
-  updateMatrix<-eventReactive(input$subMat, {if(input$nrows == 2){
-    expr=as.data.frame(matrixcalc::matrix.power(ogMat2(),as.integer(input$steps)), 
-                       row.names=0:1,
-                       optional=TRUE)} 
+  # Updates the matrix when the Calculate Matrix button is pressed
+  updateMatrix<-eventReactive(input$subMat, {
+    if(input$nrows == 2){
+      expr=as.data.frame(matrixcalc::matrix.power(ogMat2(),
+                                                  as.integer(input$steps)), 
+                         row.names=0:1,
+                         optional=TRUE)} 
     else if (input$nrows==3){
       as.data.frame(matrixcalc::matrix.power(ogMat3(),as.integer(input$steps)), 
                     row.names=0:2, 
@@ -615,172 +534,124 @@ server<-function(input, output, session) {
                     row.names=0:4, 
                     optional=TRUE)}})
   
-  props<-eventReactive(input$runSteps,{
-    #rowsum<-sum(totals[as.numeric(input$nrows), 1:2])
-    rowsum<-sum(runSteps())
-    if(input$nrows==2){
-      paste("Actual: ", 
-            round(runSteps()[1]/rowsum,2),
-            "   ", 
-            round(runSteps()[2]/rowsum,2),
-            sep ="\t\t\t")}
-    else if(input$nrows==3){
-      paste("Actual: ", 
-            round(runSteps()[1]/rowsum,2),
-            " ",
-            round(runSteps()[2]/rowsum,2),
-            " ",
-            round(runSteps()[3]/rowsum,2))}
-    else if(input$nrows==4){
-      paste("Actual: ", 
-            round(runSteps()[1]/rowsum,2),
-            " ",
-            round(runSteps()[2]/rowsum,2),
-            " ", 
-            round(runSteps()[3]/rowsum,2),
-            " ",
-            round(runSteps()[4]/rowsum,2))}
-    else{" "}
-  })
-  longRuns<-eventReactive(input$runSteps,{
-    if(as.numeric(input$nrows)==2){
-      mat<-matrixcalc::matrix.power(ogMat2(),20)[1,1:2]
-      paste("Long Run:", round(mat[1],2), round(mat[2],2))}
-    else if(as.numeric(input$nrows)==3){
-      mat<-matrixcalc::matrix.power(ogMat3(),20)[1,1:3]
-      paste("Long Run:", round(mat[1],2), round(mat[2],2), round(mat[3],2))}  
-    else if(as.numeric(input$nrows)==4){
-      mat<-matrixcalc::matrix.power(ogMat4(),20)[1,1:4]
-      paste("Long Run:", round(mat[1],2), round(mat[2],2), 
-            round(mat[3],2), round(mat[4],2))} 
-    else{
-      mat<-matrixcalc::matrix.power(mat<-ogMat5(),20)[1,1:5]}
-  })
-  makePlot<-eventReactive(input$runSteps,{
-    barplot(runSteps(), 
-            main="Distrubution of states visited", 
-            names.arg=0:(as.numeric(input$nrows)-1))})
-  
-  output$plot<-renderPlot({makePlot()})
-  output$matlabel<-renderText({
-    if(input$subMat){paste("Probability Matrix ", 
-                           as.integer(input$steps), 
-                           " Steps Out")}})
+  # Outputted matrix (the one to the nth power)
   output$mat<-renderTable({
     updateMatrix()}, rownames=TRUE, striped=FALSE
   )
-  output$proportions<-renderText({
-    props()
-  })
-  output$longRun<-renderText({
-    longRuns()})
-  #output$outmattemp<-renderTable({as.data.frame(runSteps())}) # Table for testing purposes
-  
-  
+
   # PROBLEMS ----
-  game <- reactiveValues(score = 0, context = "", probw1 = 0, probw2=0, probSLRG = 0,
-  probSLGY = 0, probSLGR = 0, probSLGG = 0,
-  probSLYY = 0, probSLYR = 0, probSLYG = 0,
-  probSLRY = 0, probSLRR = 0, probCandy = 0, probCookie = 0,
-  inLab = "", correctMat = diag(2), correctMatSL = diag(3), correctMatC = diag(2),
-  showFeedback = F)
-  output$score <- renderText({"Score: 0"})
+  # All of the variables that will be tracked in the various scenarios
+  game <- reactiveValues(score = 0, context = "", probw1 = 0, probw2=0, 
+                         probSLRG = 0, probSLGY = 0, probSLGR = 0, probSLGG = 0,
+                         probSLYY = 0, probSLYR = 0, probSLYG = 0,
+                         probSLRY = 0, probSLRR = 0, probCandy = 0, 
+                         probCookie = 0, inLab = "", correctMat = diag(2), 
+                         correctMatSL = diag(3), correctMatC = diag(2),
+                         showFeedback = F)
   
   # WEATHER
+  # Sets the variables for the weather scenario
   weatherVars <- reactive({
     game$probW1 <- sample(c(.5, .6, .7, .8, .9), size = 1, replace = T)
     game$probW2 <- sample(c(.5, .4, .3, .2, .1), size = 1, replace = T)
-    game$correctMat <- matrix(c(game$probW1, 1-game$probW1, game$probW2, 1-game$probW2),
+    game$correctMat <- matrix(c(game$probW1, 1-game$probW1, 
+                                game$probW2, 1-game$probW2),
                               nrow=2, byrow = TRUE)
   })
   
+  # Used to get answers to the questions
+  # Takes matrix correctMat to power pow then reads element [start, col]
   gameAns <- function(correctMat, start, pow, col = 1){
     matrixcalc::matrix.power(correctMat, pow)[start, col]
-    # c(correctMat[start, 1],
-    #   matrixcalc::matrix.power(correctMat,7)[start, 1],
-    #   matrixcalc::matrix.power(correctMat,30)[start, 1],
-    #   matrixcalc::matrix.power(correctMat,365)[start, 1]  
-    # )
   }
+  
+  # Picture to go with weather question 1 (x or check)
   output$correctnessW1 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$tomorrowProb1)) && 
-                     round(input$tomorrowProb1,2) == round(gameAns(game$correctMat, 1, 1),2))})
+                     round(input$tomorrowProb1,2) == 
+                     round(gameAns(game$correctMat, 1, 1),2))})
   
+  # Picture to go with weather question 2 (x or check)
   output$correctnessW2 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$weekProb1)) && 
-                     round(input$weekProb1, 2) == round(gameAns(game$correctMat, 1, 7), 2))})
+                     round(input$weekProb1, 2) == 
+                     round(gameAns(game$correctMat, 1, 7), 2))})
   
+  # Picture to go with weather question 3 (x or check)
   output$correctnessW3 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$monthProb1)) && 
-                     round(input$monthProb1, 2) == round(gameAns(game$correctMat, 1, 30), 2))})
+                     round(input$monthProb1, 2) == 
+                     round(gameAns(game$correctMat, 1, 30), 2))})
   
+  # Picture to go with weather question 4 (x or check)
   output$correctnessW4 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$yearProb1)) && 
-                     round(input$yearProb1, 2) == round(gameAns(game$correctMat, 1, 365), 2))})
+                     round(input$yearProb1, 2) == 
+                     round(gameAns(game$correctMat, 1, 365), 2))})
 
-  observeEvent(input$checkGame, {game$showFeedback <- T
-  })
-  
+  # Show feedback after Check Game but reset to no feedback if any input is changed
+  observeEvent(input$checkGame, {game$showFeedback <- T})
   observeEvent(input$tomorrowProb1, {game$showFeedback <- F})
   observeEvent(input$weekProb1, {game$showFeedback <- F})
   observeEvent(input$monthProb1, {game$showFeedback <- F})
   observeEvent(input$yearProb1, {game$showFeedback <- F})
   
-  observeEvent(input$tabs, {
-    click("newWeather")
-  })
+  # Mostly here to make sure the weather vars get set at the beginning
+  observeEvent(input$tabs, {click("newWeather")})
   
+  # Statement for the weather problem
   output$weatherProb <- renderText({
-  #weatherVars() # This may be temporary once I put in a "new probabilities" button
   paste("Every morning, Ben wakes up at 8am and looks out his window to check 
   the weather. If it rains today tomorrow it will rain with probability", 
   game$probW1, "If it doesn't rain today, then it will rain tomorrow with 
   probability", game$probW2,".")})
   
+  # When user clicks the New Problem button for the weather scenario
   observeEvent(input$newWeather, {
-    click("newWeatherPlotSamples")
-    game$showFeedback <- F
-    game$probW1 <- sample(.1*(2:9), size = 1, replace = T)
-    if(game$probW1 ==.2){
-      options <- (.01*(1:10))
-    }
-    else{options <- .1*(1:(ceiling(game$probW1*5)))
-      }
+    click("newWeatherPlotSamples") # Updates plot
+    game$showFeedback <- F # Hides feedback
+    game$probW1 <- sample(.1*(2:9), size = 1, replace = T) # Updates probabilities
+    # Decides on the probability of no rain after rain; 
+    # make sure it is less than rain to rain
+    if(game$probW1 ==.2){options <- (.01*(1:10))}
+    else{options <- .1*(1:(ceiling(game$probW1*5)))}
     game$probW2 <- sample(options, size = 1, replace = T)
-    # print(game$probW1 )
-    # print(game$probW2)
-    game$correctMat <- matrix(c(game$probW1, 1-game$probW1, game$probW2, 1-game$probW2), 
+    
+    # Updates correct probability matrix based on above
+    game$correctMat <- matrix(c(game$probW1, 1-game$probW1, 
+                                game$probW2, 1-game$probW2), 
                               nrow=2, byrow=TRUE)})
   
+  # Do walk of 365 days for weather problem
   weatherSteps <- eventReactive(input$newWeatherPlotSamples, {
-    #totals<-matrix(rep(0,25), nrow=5)
     curState <- 0
     index <- 0:365
     states <- c(0)
     rainSum <- c(1)
+    
+    # For each day, sample either rain or not based on the day before
     for(x in 1:365){
       curState <- sample(c(0,1), 1, replace=TRUE, prob=game$correctMat[curState+1,])
       states <- c(states, curState)
       rainSum <-c(rainSum, rainSum[x]+1-curState)
-      
-      #totals[as.numeric(input$nrows)-1, curState+1]<-totals[as.numeric(input$nrows)-1, curState+1]+1
     }
-    data.frame(day = index, state = states, Rain = rainSum/(index+1), None = 1 - rainSum/(index+1))
+    
+    # Return a data frame with the samples
+    data.frame(day = index, 
+               state = states, 
+               Rain = rainSum/(index+1), 
+               None = 1 - rainSum/(index+1))
   })
   
+  # Create the daily weather plot for first week
   output$weatherDaily <- renderPlot({
       plot<-ggplot2::ggplot(aes(x = day, y = state), data= weatherSteps()[1:31,]) +
-        #geom_hline(aes(yintercept=trueSum, linetype="True sum"), show.legend=F, size=1) +
-        #scale_linetype_manual(name = "", values = c("dotted"))+
-        #ylim(c(
-        #  min(matrixSum, trueSum)-.01,
-        #  max(matrixSum, trueSum)+.01
-        #))+
-        geom_point() +
+        geom_point(size = 2) +
         geom_path() +
         xlab("Day Number") + 
-        ylab('State (0 = Rain)') +
-        ggtitle("States by day over the first week")+
+        ylab('State') +
+        scale_y_continuous(breaks = 0:1, labels = c("Rain", "No Rain")) +
+        ggtitle("States by Day Over the First Month")+
         theme(axis.text = element_text(size=18),
               plot.title = element_text(size=18, face="bold"),
               axis.title = element_text(size=18),
@@ -789,36 +660,32 @@ server<-function(input, output, session) {
               legend.text = element_text(size=14),
               legend.title = element_text(size = 16)
         )
-      
-      # Add paths
-      # for(i in 1:path){
-      #   plot<-plot + geom_path(aes_string(x='x', y=allNames[i]), data=data, color=colors[i], size=1.5)
-      # }
       plot
     
   })
+  
+  # Create the plot of cumulative probability for rain and not rain
   output$weatherCumulativeProb <- renderPlot({
-    data <- pivot_longer(weatherSteps(), cols = c("Rain", "None"), names_to = "Rain", values_to = "Proportion")
+    data <- pivot_longer(weatherSteps(), 
+                         cols = c("Rain", "None"), 
+                         names_to = "Rain", 
+                         values_to = "Proportion")
     plot<-ggplot2::ggplot(aes(x = day, y =Proportion, color = Rain), data= data) +
-      # geom_vline(aes(xintercept = 1)) +
-      # geom_vline(aes(xintercept = 7)) +
-      # geom_vline(aes(xintercept = 30)) +
-      # geom_vline(aes(xintercept = 365)) +
-      #geom_hline(aes(yintercept=trueSum, linetype="True sum"), show.legend=F, size=1) +
-      #scale_linetype_manual(name = "", values = c("dotted"))+
-      #ylim(c(
-      #  min(matrixSum, trueSum)-.01,
-      #  max(matrixSum, trueSum)+.01
-      #))+
-      geom_hline(aes(yintercept = 1 - gameAns(game$correctMat, 1, 365)), color = boastPalette[1], linetype = "dashed", lwd = 1, show.legend = TRUE) +
-      geom_hline(aes(yintercept = gameAns(game$correctMat, 1, 365)), color = boastPalette[2], linetype = "dashed", lwd = 1, show.legend = TRUE) +
+      geom_hline(aes(yintercept = 1 - gameAns(game$correctMat, 1, 365)), 
+                 color = boastPalette[1], 
+                 linetype = "dashed", 
+                 lwd = 1, 
+                 show.legend = TRUE) +
+      geom_hline(aes(yintercept = gameAns(game$correctMat, 1, 365)), 
+                 color = boastPalette[2], 
+                 linetype = "dashed", 
+                 lwd = 1, 
+                 show.legend = TRUE) +
       scale_colour_manual(values = boastUtils::boastPalette) +
       geom_path(lwd = 1) +
-      #geom_path(colour = colors[1]) +
-      #geom_path(aes(y = 1-probabilities), colour = colors[2]) +
       xlab("Day Number") + 
       ylab('Cumulative portion of rainy days') +
-      ggtitle("Portion of days of rain over time")+
+      ggtitle("Portion of Days of Rain Over Time")+
       theme(axis.text = element_text(size=18),
             plot.title = element_text(size=18, face="bold"),
             axis.title = element_text(size=18),
@@ -826,17 +693,13 @@ server<-function(input, output, session) {
             legend.text = element_text(size=14),
             legend.title = element_text(size = 16)
       )
-    
-    # Add paths
-    # for(i in 1:path){
-    #   plot<-plot + geom_path(aes_string(x='x', y=allNames[i]), data=data, color=colors[i], size=1.5)
-    # }
     plot
   })
   
   # STOP LIGHTS
-  # Resets the probabilities of Green, Red, or Yellow lights. (based loosely on 
-  # traffic light stats that I looked up; y=3-6 seconds, cycle = 1-3 min)
+  # Resets the probabilities of Green, Red, or Yellow lights
+  # The double letter pair at the end of each name stands for the color to color
+  # Ex. YG means the probability of transitioning from a yellow to a green light
   createProbs <- reactive({
     game$probSLYY <- round(runif(n = 1, min=.02, max=.08),2)
     game$probSLYG <- round(runif(n = 1, min = .2, max = .7), 2)
@@ -853,7 +716,9 @@ server<-function(input, output, session) {
                              nrow=3, byrow = T)
   })
   
+  # Update lights values for a new problem
   observeEvent(input$newLights, {
+    click("newLightPlotSamples")
     game$showFeedback <- F
     game$probSLYY <- round(runif(n = 1, min=.02, max=.08),2)
     game$probSLYG <- round(runif(n = 1, min = .2, max = .7), 2)
@@ -869,7 +734,7 @@ server<-function(input, output, session) {
                                   game$probSLRG, game$probSLRY, game$probSLRR), 
                                 nrow=3, byrow = T)})
 
-  
+  # Text for the traffic lights problem
   output$lightProb <- renderText({
     createProbs()
   paste0("Sarah is driving down a road with 10 traffic lights.
@@ -878,48 +743,63 @@ server<-function(input, output, session) {
     it being red is ", game$probSLGR, " with the remaining probability on yellow. 
     If the current light is yellow, then the probability of the next light being 
         green is ", game$probSLYG, " and the probability of the next light being 
-        red is ", game$probSLYR, ". Lastly, if the current light is red, then the probability 
-        of the next light being green is ", game$probSLRG, " while the probability of 
-        it being red is ", game$probSLRR, ". Suppose the first light is green; calculate 
-        the below probabilities for some of the following lights." 
+        red is ", game$probSLYR, ". Lastly, if the current light is red, then the 
+        probability of the next light being green is ", game$probSLRG, " while 
+        the probability of it being red is ", game$probSLRR, ". Suppose the first 
+        light is green; calculate the below probabilities for some of the 
+         following lights." 
     )
   })
   
+  # Check or X for probability that the first light is green
   output$correctnessLG1 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$TLG1)) && 
-                     round(input$TLG1, 2) == round(gameAns(game$correctMatSL, 1, 1), 2))})
+                     round(input$TLG1, 2) == 
+                     round(gameAns(game$correctMatSL, 1, 1), 2))})
   
+  # Check or X for probability that the first light is red
   output$correctnessLR1 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$TLR1)) && 
-                     round(input$TLR1, 2) == round(gameAns(game$correctMatSL, 1, 1, col = 3), 2))})
+                     round(input$TLR1, 2) == 
+                     round(gameAns(game$correctMatSL, 1, 1, col = 3), 2))})
   
+  # Check or X for probability that the fifth light is green
   output$correctnessLG5 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$TLG5)) && 
-                     round(input$TLG5, 2) == round(gameAns(game$correctMatSL, 1, 5), 2))})
+                     round(input$TLG5, 2) == 
+                     round(gameAns(game$correctMatSL, 1, 5), 2))})
 
-  
+  # Check or X for probability that the fifth light is red
   output$correctnessLR5 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$TLR5)) && 
-                     round(input$TLR5, 2) == round(gameAns(game$correctMatSL, 1, 5, col = 3), 2))})
+                     round(input$TLR5, 2) == 
+                     round(gameAns(game$correctMatSL, 1, 5, col = 3), 2))})
   
+  # Check or X for probability that the last light is green
   output$correctnessLG9 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$TLG9)) && 
-                     round(input$TLG9, 2) == round(gameAns(game$correctMatSL, 1, 9), 2))})
+                     round(input$TLG9, 2) == 
+                     round(gameAns(game$correctMatSL, 1, 9), 2))})
   
+  # Check or X for probability that the last light is red
   output$correctnessLR9 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$TLR9)) && 
-                     round(input$TLR9, 2) == round(gameAns(game$correctMatSL, 1, 9, col = 3), 2))})
+                     round(input$TLR9, 2) == 
+                     round(gameAns(game$correctMatSL, 1, 9, col = 3), 2))})
   
-  observeEvent(input$checkGameLights, {game$showFeedback <- T
-  })
+  # Controls feedback display
+  # Show feedback if the button is pressed; hide feedback if the answers change
+  observeEvent(input$checkGameLights, {game$showFeedback <- T})
   observeEvent(input$TLG1, {game$showFeedback <- F})
   observeEvent(input$TLR1, {game$showFeedback <- F})
   observeEvent(input$TLG5, {game$showFeedback <- F})
   observeEvent(input$TLR5, {game$showFeedback <- F})
   observeEvent(input$TLG9, {game$showFeedback <- F})
   observeEvent(input$TLR9, {game$showFeedback <- F})
-
   
+  observeEvent(input$tabs, {click("newLights")})
+  
+  # Does a walk of length 10 using the probability matrix for lights problem
   lightSteps <- eventReactive(input$newLightPlotSamples, {
     curState <- 0
     index <- 0:10
@@ -930,8 +810,12 @@ server<-function(input, output, session) {
     greens <- c(1)
     reds <- c(0)
     yellows <- c(0)
+    
+    # For each light, sample the outcome based on the previous light
     for(x in 1:10){
-      curState <- sample(c(0,1,2), 1, replace=TRUE, prob=game$correctMatSL[curState+1,])
+      curState <- sample(c(0,1,2), 1, 
+                         replace=TRUE, 
+                         prob=game$correctMatSL[curState+1,])
       states <- c(states, curState)
       if(curState == 0){
         Green <- Green + 1
@@ -945,23 +829,25 @@ server<-function(input, output, session) {
       reds <-c(reds, Red)
       greens <- c(greens, Green)
       yellows <- c(yellows, Yellow)
-      }
-    data.frame(day = index, state = states, Green = greens, Yellow = yellows, Red = reds)
+    }
+    
+    # Return data frame of results
+    data.frame(day = index, 
+               state = states, 
+               Green = greens, 
+               Yellow = yellows, 
+               Red = reds)
   })
 
+  # Create plot for all 10 lights by state
   output$lightDaily <- renderPlot({
     plot<-ggplot2::ggplot(aes(x = day, y = state), data= lightSteps()) +
-      #geom_hline(aes(yintercept=trueSum, linetype="True sum"), show.legend=F, size=1) +
-      #scale_linetype_manual(name = "", values = c("dotted"))+
-      #ylim(c(
-      #  min(matrixSum, trueSum)-.01,
-      #  max(matrixSum, trueSum)+.01
-      #))+
-      geom_point() +
+      geom_point(size = 2) +
       geom_path() +
       xlab("Light Number") + 
-      ylab('State (0 = Green, 1 = Yellow, 2 = Red)') +
-      ggtitle("States by light number")+
+      ylab('State') +
+      scale_y_continuous(breaks = 0:2, labels = c("Green", "Yellow", "Red")) +
+      ggtitle("States by Light Number")+
       theme(axis.text = element_text(size=18),
             plot.title = element_text(size=18, face="bold"),
             axis.title = element_text(size=18),
@@ -970,36 +856,35 @@ server<-function(input, output, session) {
             legend.text = element_text(size=14),
             legend.title = element_text(size = 16)
       )
-    
-    # Add paths
-    # for(i in 1:path){
-    #   plot<-plot + geom_path(aes_string(x='x', y=allNames[i]), data=data, color=colors[i], size=1.5)
-    # }
     plot
-    
   })
   
+  
+  # Create plot of cumulative proportions spent in each state
   output$lightCumulativeProb<- renderPlot({
-    data <- pivot_longer(lightSteps(), cols = c("Red", "Yellow", "Green"), names_to = "Color", values_to = "Proportion")
+    data <- pivot_longer(lightSteps(), cols = c("Red", "Yellow", "Green"), 
+                         names_to = "Color", values_to = "Proportion")
     data$Proportion <- data$Proportion / (data$day + 1)
-    plot<-ggplot2::ggplot(aes(x = day, y = Proportion, color = Color), data= data) +
+    plot<-ggplot2::ggplot(aes(x = day, y = Proportion, color = Color), 
+                          data= data) +
       scale_colour_manual(values = c("#009E73", "red", "#E69F00")) +
-      # geom_vline(aes(xintercept = 1)) +
-      # geom_vline(aes(xintercept = 7)) +
-      # geom_vline(aes(xintercept = 30)) +
-      # geom_vline(aes(xintercept = 365)) +
-      #geom_hline(aes(yintercept=trueSum, linetype="True sum"), show.legend=F, size=1) +
-      #scale_linetype_manual(name = "", values = c("dotted"))+
-      #ylim(c(
-      #  min(matrixSum, trueSum)-.01,
-      #  max(matrixSum, trueSum)+.01
-      #))+
-      geom_hline(aes(yintercept = gameAns(game$correctMatSL, 1, 100, col = 1)), lwd = 1, linetype = "dashed", color = "#009E73", show.legend = TRUE) +
-      geom_hline(aes(yintercept = gameAns(game$correctMatSL, 1, 100, col = 2)), lwd = 1, linetype = "dashed", color = "#E69F00", show.legend = TRUE) +
-      geom_hline(aes(yintercept = gameAns(game$correctMatSL, 1, 100, col = 3)), lwd = 1, linetype = "dashed", color = "red", show.legend = TRUE) +
+      geom_hline(aes(yintercept = gameAns(game$correctMatSL, 1, 100, col = 1)), 
+                 lwd = 1, 
+                 linetype = "dashed", 
+                 color = "#009E73", 
+                 show.legend = TRUE) +
+      geom_hline(aes(yintercept = gameAns(game$correctMatSL, 1, 100, col = 2)), 
+                 lwd = 1, 
+                 linetype = "dashed", 
+                 color = "#E69F00", 
+                 show.legend = TRUE) +
+      geom_hline(aes(yintercept = gameAns(game$correctMatSL, 1, 100, col = 3)), 
+                 lwd = 1, 
+                 linetype = "dashed", 
+                 color = "red", 
+                 show.legend = TRUE) +
       geom_path(lwd = 1) +
       geom_point(aes(shape = Color), size = 3) +
-      # geom_path(aes(y = 1-probabilities), colour = colors[2]) +
       xlab("Light number") + 
       ylab('Cumulative proportions') +
       ggtitle("Portion of Light Colors Over Time")+
@@ -1010,106 +895,113 @@ server<-function(input, output, session) {
             legend.text = element_text(size=14),
             legend.title = element_text(size = 16)
       )
-    
-    # Add paths
-    # for(i in 1:path){
-    #   plot<-plot + geom_path(aes_string(x='x', y=allNames[i]), data=data, color=colors[i], size=1.5)
-    # }
     plot
   })
   
   # CANDY
+  # Assign probabilities to the candy/cookies problem
   createCandy <- reactive({
     game$probCandy <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
     game$probCookie <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
-    game$correctMatC <- matrix(c(game$probCandy, 1-game$probCandy, 1 - game$probCookie, game$probCookie),
+    game$correctMatC <- matrix(c(game$probCandy, 1-game$probCandy, 
+                                 1 - game$probCookie, game$probCookie),
                               nrow=2, byrow = TRUE)
   })
   
+  # Set up text for the candy problem
   output$candyProb <- renderText({
   createCandy()
   paste0("Mrs. Gamble's kindergarten class has 20 students. 
     One day, she brings in a jar of cookies and a bag of candy and gives each 
-    student the choice between either candy or a cookie. Each student then sequentially
-    chooses a treat. Without any influence from the other students, each student is
-    equally likely to choose either option, but being impressionable young children, 
-    the choice of each student is impacted by the choice of the previous student. 
-    As such, if the previous student chose candy, then the next student will choose 
-    candy with probability ", game$probCandy, ", and if the previous student 
-    chose a cookie then the next student will choose a cookie with probability ", 
-    game$probCookie, ". Assuming that the first student chooses a cookie, 
-    calculate the following probabilities.")})
-  
-  
-  # WEATHER
- 
-  # correctMat, start, pow, col = 1
+    student the choice between either candy or a cookie. Each student then 
+    sequentially chooses a treat. Without any influence from the other students, 
+    each student is equally likely to choose either option, but being 
+    impressionable young children, the choice of each student is impacted by the 
+    choice of the previous student. As such, if the previous student chose candy, 
+    then the next student will choose candy with probability ", game$probCandy, 
+    ", and if the previous student chose a cookie then the next student will 
+    choose a cookie with probability ", game$probCookie, ". Assuming that the 
+    first student chooses a cookie, calculate the following probabilities.")})
+
+  # Output check or X for first question (child 1)
   output$correctnessChild1 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$child1Prob)) && 
                      round(input$child1Prob,2) == game$correctMatC[2,2])})
   
+  # Output check or X for second question (child 5)
   output$correctnessChild5 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$child5Prob)) && 
-                     round(input$child5Prob, 2) == round(.5*gameAns(game$correctMatC, 1, 5) + .5*gameAns(game$correctMatC, 2, 5), 2))})
+                     round(input$child5Prob, 2) == 
+                     round(.5*gameAns(game$correctMatC, 1, 5) + 
+                             .5*gameAns(game$correctMatC, 2, 5), 2))})
   
+  # Output check or X for third question (child 10)
   output$correctnessChild10 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$child10Prob)) && 
-                     round(input$child10Prob, 2) == round(.5*gameAns(game$correctMatC, 1, 10) + .5*gameAns(game$correctMatC, 2, 10), 2))})
+                     round(input$child10Prob, 2) == 
+                     round(.5*gameAns(game$correctMatC, 1, 10) + 
+                             .5*gameAns(game$correctMatC, 2, 10), 2))})
   
+  # Output check or X for fourth question (child 20)
   output$correctnessChild20 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$child20Prob)) && 
-                     round(input$child20Prob, 2) == round(.5*gameAns(game$correctMatC, 1, 20) + .5*gameAns(game$correctMatC, 2, 20), 2))})
+                     round(input$child20Prob, 2) == 
+                     round(.5*gameAns(game$correctMatC, 1, 20) + 
+                             .5*gameAns(game$correctMatC, 2, 20), 2))})
   
-  observeEvent(input$checkCandy, {game$showFeedback <- T
-  })
-
+  # Control when feedback is displayed (only directly after pressing the button)
+  observeEvent(input$checkCandy, {game$showFeedback <- T})
   observeEvent(input$child1Prob, {game$showFeedback <- F})
   observeEvent(input$child5Prob, {game$showFeedback <- F})
   observeEvent(input$child10Prob, {game$showFeedback <- F})
   observeEvent(input$child20Prob, {game$showFeedback <- F})
-
+  
+  # When tabs switch, make sure feedback goes away and candy problem is updated
   observeEvent(input$tabs, {
     game$showFeedback <- F
-    click("newCandy")
+    click("newCandy") # Mostly to make sure that the initial problem renders
   })
-
+  
+  # When a new problem is requested, update numbers and plots
   observeEvent(input$newCandy, {
     click("newCandyPlotSamples")
     game$showFeedback <- F
     game$probCandy <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
     game$probCookie <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
-    game$correctMatC <- matrix(c(game$probCandy, 1-game$probCandy, 1 - game$probCookie, game$probCookie),
+    game$correctMatC <- matrix(c(game$probCandy, 1-game$probCandy, 
+                                 1 - game$probCookie, game$probCookie),
                                nrow=2, byrow = TRUE)
     })
-
+  
+  # Assigns all students a cookie or candy choice based on current probabilities
   candySteps <- eventReactive(input$newCandyPlotSamples, {
-    #totals<-matrix(rep(0,25), nrow=5)
     curState <- 0
     index <- 1:20
     states <- c(1)
     cookieSum <- c(1)
+    # Loop through all remaining students
     for(x in 2:20){
-      curState <- sample(c(0,1), 1, replace=TRUE, prob=game$correctMatC[curState+1,])
+      curState <- sample(c(0,1), 1, replace=TRUE, 
+                         prob=game$correctMatC[curState+1,])
       states <- c(states, curState)
       cookieSum <-c(cookieSum, cookieSum[x-1] + curState)
-
-      #totals[as.numeric(input$nrows)-1, curState+1]<-totals[as.numeric(input$nrows)-1, curState+1]+1
     }
-    data.frame(day = index, state = states, Cookie = cookieSum/(index), Candy = 1 - cookieSum/(index))
+    
+    # Return data frame of data generated by the simulation
+    data.frame(day = index, 
+               state = states,
+               Cookie = cookieSum/(index), 
+               Candy = 1 - cookieSum/(index))
   })
-
+  
+  # Plots the choices of each of the children
   output$candyDaily <- renderPlot({
     plot<-ggplot2::ggplot(aes(x = day, y = state), data= candySteps()) +
-      #geom_hline(aes(yintercept=trueSum, linetype="True sum"), show.legend=F, size=1) +
-      #scale_linetype_manual(name = "", values = c("dotted"))+
-      #ylim(c(
-      #  min(matrixSum, trueSum)-.01,
-      #  max(matrixSum, trueSum)+.01
-      #))+
-      geom_point() +
+      geom_point(size = 2) +
       geom_path() +
       xlab("Student") +
-      ylab('State (0 = Candy)') +
+      ylab('State') +
+      scale_y_continuous(breaks = 0:1, labels = c("Candy", "Cookie")) +
       ggtitle("Children's Choices")+
       theme(axis.text = element_text(size=18),
             plot.title = element_text(size=18, face="bold"),
@@ -1119,36 +1011,32 @@ server<-function(input, output, session) {
             legend.text = element_text(size=14),
             legend.title = element_text(size = 16)
       )
-
-    # Add paths
-    # for(i in 1:path){
-    #   plot<-plot + geom_path(aes_string(x='x', y=allNames[i]), data=data, color=colors[i], size=1.5)
-    # }
     plot
-
   })
+  
+  # Plots the cumulative proportion of candy and cookie chosen
   output$candyCumulativeProb <- renderPlot({
-    data <- pivot_longer(candySteps(), cols = c("Candy", "Cookie"), names_to = "Choice", values_to = "Proportion")
-    plot<-ggplot2::ggplot(aes(x = day, y =Proportion, color = Choice), data= data) +
-      # geom_vline(aes(xintercept = 1)) +
-      # geom_vline(aes(xintercept = 7)) +
-      # geom_vline(aes(xintercept = 30)) +
-      # geom_vline(aes(xintercept = 365)) +
-      #geom_hline(aes(yintercept=trueSum, linetype="True sum"), show.legend=F, size=1) +
-      #scale_linetype_manual(name = "", values = c("dotted"))+
-      #ylim(c(
-      #  min(matrixSum, trueSum)-.01,
-      #  max(matrixSum, trueSum)+.01
-      #))+
-      geom_hline(aes(yintercept = gameAns(game$correctMatC, 1, 365)), color = boastPalette[1], linetype = "dashed", lwd = 1, show.legend = TRUE) +
-      geom_hline(aes(yintercept = 1 - gameAns(game$correctMatC, 1, 365)), color = boastPalette[2], linetype = "dashed", lwd = 1, show.legend = TRUE) +
+    data <- pivot_longer(candySteps(), 
+                         cols = c("Candy", "Cookie"), 
+                         names_to = "Choice", 
+                         values_to = "Proportion")
+    plot<-ggplot2::ggplot(aes(x = day, y =Proportion, color = Choice), 
+                          data= data) +
+      geom_hline(aes(yintercept = gameAns(game$correctMatC, 1, 365)), 
+                 color = boastPalette[1], 
+                 linetype = "dashed", 
+                 lwd = 1, 
+                 show.legend = TRUE) +
+      geom_hline(aes(yintercept = 1 - gameAns(game$correctMatC, 1, 365)), 
+                 color = boastPalette[2], 
+                 linetype = "dashed", 
+                 lwd = 1, 
+                 show.legend = TRUE) +
       scale_colour_manual(values = boastUtils::boastPalette) +
       geom_path(lwd = 1) +
-      #geom_path(colour = colors[1]) +
-      #geom_path(aes(y = 1-probabilities), colour = colors[2]) +
       xlab("Student") +
       ylab('Cumulative portion by choice type') +
-      ggtitle("Portion Student Choices")+
+      ggtitle("Portion Student Choices") +
       theme(axis.text = element_text(size=18),
             plot.title = element_text(size=18, face="bold"),
             axis.title = element_text(size=18),
@@ -1156,14 +1044,8 @@ server<-function(input, output, session) {
             legend.text = element_text(size=14),
             legend.title = element_text(size = 16)
       )
-
-    # Add paths
-    # for(i in 1:path){
-    #   plot<-plot + geom_path(aes_string(x='x', y=allNames[i]), data=data, color=colors[i], size=1.5)
-    # }
     plot
   })
-
 }
 
 
