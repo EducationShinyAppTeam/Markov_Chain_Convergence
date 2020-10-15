@@ -242,8 +242,10 @@ ui <- list(
                  checkboxInput("showCandyPlots", "Show sample candy plots"),
                  conditionalPanel( 
                    condition = "input.showCandyPlots",
-                   plotOutput("candyDaily", height = '250px'),  
+                   plotOutput("candyDaily", height = '250px'), 
+                   htmlOutput("candyDailyAlt"),
                    plotOutput("candyCumulativeProb", height = '300px'),
+                   htmlOutput("candyCumulativeAlt"),
                    actionButton("newCandyPlotSamples", "New Sample"))
                  )
           
@@ -309,8 +311,10 @@ ui <- list(
             checkboxInput("showLightPlots", "Show sample light plots"),
             conditionalPanel( 
               condition = "input.showLightPlots",
-              plotOutput("lightDaily", height = '250px'),  
+              plotOutput("lightDaily", height = '250px'),
+              htmlOutput("lightDailyAlt"),
               plotOutput("lightCumulativeProb", height = '300px'),
+              htmlOutput("lightCumulativeAlt"),
               actionButton("newLightPlotSamples", "New Sample"))
           ),
           tabPanel(
@@ -370,8 +374,10 @@ ui <- list(
                 checkboxInput("showWeatherPlots", "Show sample weather plots"),
                 conditionalPanel( 
                   condition = "input.showWeatherPlots",
-                  plotOutput("weatherDaily", height = '250px'),   
+                  plotOutput("weatherDaily", height = '250px'), 
+                  htmlOutput("weatherDailyAlt"),
                   plotOutput("weatherCumulativeProb", height = '300px'),
+                  htmlOutput("weatherCumulativeAlt"),
                   actionButton("newWeatherPlotSamples", "New Sample"))
               )
             )
@@ -664,6 +670,16 @@ server<-function(input, output, session) {
     
   })
   
+  # Alt-text
+  output$weatherDailyAlt <- renderUI({
+    tags$script(HTML(
+      paste0("$(document).ready(function() {
+            document.getElementById('weatherDaily').setAttribute('aria-label',
+            `This plot shows the weather for one month of samples drawn from
+             the chain in the problem.`)})"
+      )))
+  })
+  
   # Create the plot of cumulative probability for rain and not rain
   output$weatherCumulativeProb <- renderPlot({
     data <- pivot_longer(weatherSteps(), 
@@ -694,6 +710,17 @@ server<-function(input, output, session) {
             legend.title = element_text(size = 16)
       )
     plot
+  })
+  
+  # Alt-text
+  output$weatherCumulativeAlt <- renderUI({
+    tags$script(HTML(
+      paste0("$(document).ready(function() {
+            document.getElementById('weatherCumulativeProb').setAttribute('aria-label',
+            `This plot shows the cumulative proportion of days of each weather type
+            for one simulated year. Over time, these proportions get closer to the 
+             long run proportions.`)})"
+      )))
   })
   
   # STOP LIGHTS
@@ -859,6 +886,15 @@ server<-function(input, output, session) {
     plot
   })
   
+  # Alt-text
+  output$lightDailyAlt <- renderUI({
+    tags$script(HTML(
+      paste0("$(document).ready(function() {
+            document.getElementById('lightDaily').setAttribute('aria-label',
+            `This plot shows the color of each light for one simulation of 
+             the process.`)})"
+      )))
+  })
   
   # Create plot of cumulative proportions spent in each state
   output$lightCumulativeProb<- renderPlot({
@@ -896,6 +932,17 @@ server<-function(input, output, session) {
             legend.title = element_text(size = 16)
       )
     plot
+  })
+  
+  # Alt-text
+  output$lightCumulativeAlt <- renderUI({
+    tags$script(HTML(
+      paste0("$(document).ready(function() {
+            document.getElementById('lightCumulativeProb').setAttribute('aria-label',
+            `This plot shows the cumulative proportion of lights of each color 
+            for one simulation. Over time, these proportions get closer to the 
+             long run proportions.`)})"
+      )))
   })
   
   # CANDY
@@ -1014,6 +1061,16 @@ server<-function(input, output, session) {
     plot
   })
   
+  # Alt-text
+  output$candyDailyAlt <- renderUI({
+    tags$script(HTML(
+      paste0("$(document).ready(function() {
+            document.getElementById('candyDaily').setAttribute('aria-label',
+            `This plot shows the choice of each student for one simulation of 
+             the process.`)})"
+      )))
+  })
+  
   # Plots the cumulative proportion of candy and cookie chosen
   output$candyCumulativeProb <- renderPlot({
     data <- pivot_longer(candySteps(), 
@@ -1045,6 +1102,17 @@ server<-function(input, output, session) {
             legend.title = element_text(size = 16)
       )
     plot
+  })
+  
+  # Alt-text
+  output$candyCumulativeAlt <- renderUI({
+    tags$script(HTML(
+      paste0("$(document).ready(function() {
+            document.getElementById('candyCumulativeProb').setAttribute('aria-label',
+            `This plot shows the cumulative proportion of each student's choice 
+            for one simulation. Over time, these proportions get closer to the 
+             long run proportions.`)})"
+      )))
   })
 }
 
