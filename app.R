@@ -8,6 +8,7 @@ library(shinyMatrix)
 library(shinyjs)
 library(ggplot2)
 library(tidyr)
+library(matrixcalc)
 
 # App Meta Data----------------------------------------------------------------
 APP_TITLE  <<- "Convergence of Discrete-Time Markov Chains"
@@ -411,12 +412,12 @@ ui <- list(
             class = "hangingindent", 
             "Attali, D. (2020), shinyjs: Easily Improve the User Experience of 
             Your Shiny Apps in Seconds, R package. Available from  
-            https://CRAN.R-project.org/package = shinyjs"
+            https://CRAN.R-project.org/package=shinyjs"
           ), 
           p(
             class = "hangingindent",
             "Bailey, E. (2015), shinyBS: Twitter bootstrap components for shiny, 
-            R package. Available from https://CRAN.R-project.org/package = shinyBS"
+            R package. Available from https://CRAN.R-project.org/package=shinyBS"
           ),
           p(
             class = "hangingindent",
@@ -427,30 +428,36 @@ ui <- list(
             class = "hangingindent",
             "Chang, W. and Borges Ribeio, B. (2018), shinydashboard: Create
             dashboards with 'Shiny', R package. Available from
-            https://CRAN.R-project.org/package = shinydashboard"
+            https://CRAN.R-project.org/package=shinydashboard"
           ),
           p(
             class = "hangingindent",
             "Chang, W., Cheng, J., Allaire, J., Xie, Y., and McPherson, J.
             (2019), shiny: Web application framework for R, R package. Available 
-            from https://CRAN.R-project.org/package = shiny"
+            from https://CRAN.R-project.org/package=shiny"
           ),
           p(
             class = "hangingindent", 
             "Neudecker, A. (2019), shinyMatrix: Shiny Matrix Input Field, R 
             package, R package. Available from 
-            https://CRAN.R-project.org/package = shinyMatrix"
+            https://CRAN.R-project.org/package=shinyMatrix"
           ), 
+          p(
+            class = "hangingindent",
+            "Novomestky, F. (2012), matrixcalc: Collection of functions for 
+            matrix calculations., R package. Available from
+            https://CRAN.R-project.org/package=matrixcalc"
+          ),
           p(
             class = "hangingindent",
             "Perrier, V., Meyer, F., and Granjon, D. (2020), shinyWidgets: Custom 
             Inputs Widgets for Shiny, R package. Available from
-            https://CRAN.R-project.org/package = shinyWidgets"
+            https://CRAN.R-project.org/package=shinyWidgets"
           ),
           p(
             class = "hangingindent",
             "Wickham, H. and Lionel, H. (2020), tidyr: Tidy Messy Data, R package.
-            Available from https://CRAN.R-project.org/package = tidyr"
+            Available from https://CRAN.R-project.org/package=tidyr"
             ),
           p(
             class = "hangingindent",
