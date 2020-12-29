@@ -87,8 +87,8 @@ ui <- list(
                     probability calculator to answer the questions posed for each
                     context and see how quickly these probabilities converge to 
                     long run behavior."),
-            tags$li("Click the Show plots for sample paths checkbox to see 
-                    sample path that the chain could take for the problem.")
+            tags$li('Click the "Show plots for sample paths" checkbox to see a 
+                    sample path that the chain could take for the problem.')
           ),
           ##### Go Button
           div(
