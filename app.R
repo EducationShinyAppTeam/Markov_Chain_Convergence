@@ -86,7 +86,9 @@ ui <- list(
             tags$li("Use the transition matrix you created and the transition 
                     probability calculator to answer the questions posed for each
                     context and see how quickly these probabilities converge to 
-                    long run behavior.")
+                    long run behavior."),
+            tags$li("Click the Show plots for sample paths checkbox to see 
+                    sample path that the chain could take for the problem.")
           ),
           ##### Go Button
           div(
@@ -96,9 +98,18 @@ ui <- list(
               label = "GO!",
               size = "large",
               icon = icon("bolt")
-            )
           )
-        ),
+          ),
+          br(), 
+          br(), 
+          h2("Acknowledgements"), 
+          p("This app was developed and coded by Leah Hunt."),
+            br(), 
+            br(), 
+            br(), 
+            div(class = "updated", 
+                "Last Update: 11/13/2020 by LMH.")
+        ), 
 
         #### Set up an Explore Page
         tabItem(
@@ -113,8 +124,8 @@ ui <- list(
             your probability matrix then fill in the transition probabilities. 
             Note that since this is a probability matrix, the rows must sum to 1. 
             The Number of Steps allows you to choose how many steps in the future
-            to consider the matrix, i.e. the calculator with take your probability
-            to the nth power."
+            to consider the matrix, i.e. the calculator with take your 
+            probability matrix to the nth power."
           ),
           p(
             "Use the calculator to answer the problems for each scenario. To 
@@ -205,6 +216,7 @@ ui <- list(
             )
             ),
           tabsetPanel(
+            id = "problems",
             tabPanel(
                title = "Candy",
           h2("Candy or Cookies"),
@@ -220,7 +232,8 @@ ui <- list(
                 label = "Probability that the next child chooses candy", 
                 value = NA,
                 min = 0,
-                max = 1)
+                max = 1,
+                step = .01)
               ),
               column(width = 2, br(), uiOutput("correctnessChild1"))),
               fluidRow(
@@ -231,7 +244,8 @@ ui <- list(
                     label = "Probability that the fifth child chooses candy", 
                     value = NA,
                     min = 0,
-                    max = 1)
+                    max = 1,
+                    step = .01)
                 ),
                 column(width = 2, br(), uiOutput("correctnessChild5"))),
               fluidRow(
@@ -240,7 +254,8 @@ ui <- list(
                            label = "Probability that the tenth child chooses candy", 
                            value = NA,
                            min = 0,
-                           max = 1)),
+                           max = 1,
+                           step = .01)),
               column(width = 2, br(), uiOutput("correctnessChild10"))),
               fluidRow(
                 column(
@@ -250,20 +265,21 @@ ui <- list(
                     label = "Probability that the last child chooses candy", 
                     value = NA,
                     min = 0,
-                    max = 1)),
+                    max = 1,
+                    step = .01)),
                 column(width = 2, br(), uiOutput("correctnessChild20"))),
               
           actionButton("checkCandy", "Check Answer"),
           actionButton("newCandy", "New Problem")),
           column(width = 7,
-                 checkboxInput("showCandyPlots", "Show sample candy plots"),
+                 checkboxInput("showCandyPlots", "Show plots for candy sample paths"),
                  conditionalPanel( 
                    condition = "input.showCandyPlots",
                    plotOutput("candyDaily", height = '250px'), 
                    htmlOutput("candyDailyAlt"),
                    plotOutput("candyCumulativeProb", height = '300px'),
                    htmlOutput("candyCumulativeAlt"),
-                   actionButton("newCandyPlotSamples", "New Sample"))
+                   actionButton("newCandyPlotSamples", "New Sample Path"))
                  )
           
           )),
@@ -278,14 +294,16 @@ ui <- list(
                                   label = "Probability of Next Light Green", 
                                   value = NA,
                                   min = 0,
-                                  max = 1)),
+                                  max = 1,
+                                  step = .01)),
               column(width = 1, br(), uiOutput("correctnessLG1")),
               column(width = 4,
                      numericInput(inputId = "TLR1", 
                                   label = "Probability of Next Light Red", 
                                   value = NA,
                                   min = 0,
-                                  max = 1)),
+                                  max = 1,
+                                  step = .01)),
               column(width = 1, br(), uiOutput("correctnessLR1"))),
             fluidRow(  
               column(
@@ -294,7 +312,8 @@ ui <- list(
                              label = "Probability of Fifth Light from Now Green", 
                              value = NA,
                              min = 0,
-                             max = 1)
+                             max = 1,
+                             step = .01)
                      ),
               column(width = 1, br(), uiOutput("correctnessLG5")),
               column(
@@ -303,7 +322,8 @@ ui <- list(
                              label = "Probability of Fifth Light from Now Red", 
                              value = NA,
                              min = 0,
-                             max = 1)),
+                             max = 1,
+                             step = .01)),
               column(width = 1, br(), uiOutput("correctnessLR5"))
             ),
             fluidRow(  
@@ -312,7 +332,8 @@ ui <- list(
                                   label = "Probability of Last Light Green", 
                                   value = NA,
                                   min = 0,
-                                  max = 1)
+                                  max = 1,
+                                  step = .01)
               ),
               column(width = 1, br(), uiOutput("correctnessLG9")),
               column(width = 4,
@@ -320,19 +341,20 @@ ui <- list(
                                   label = "Probability of Last Light Red", 
                                   value = NA,
                                   min = 0,
-                                  max = 1)),
+                                  max = 1,
+                                  step = .01)),
               column(width = 1, br(), uiOutput("correctnessLR9"))
             ),
             actionButton("checkGameLights", "Check Answer"),
             actionButton("newLights", "New Problem"),
-            checkboxInput("showLightPlots", "Show sample light plots"),
+            checkboxInput("showLightPlots", "Show plots for light sample paths"),
             conditionalPanel( 
               condition = "input.showLightPlots",
               plotOutput("lightDaily", height = '250px'),
               htmlOutput("lightDailyAlt"),
               plotOutput("lightCumulativeProb", height = '300px'),
               htmlOutput("lightCumulativeAlt"),
-              actionButton("newLightPlotSamples", "New Sample"))
+              actionButton("newLightPlotSamples", "New Sample Path"))
           ),
           tabPanel(
             title = "Weather",
@@ -349,7 +371,8 @@ ui <- list(
                                           label = "Probability of Rain Tomorrow", 
                                           value = NA,
                                           min = 0,
-                                          max = 1)
+                                          max = 1,
+                                          step = .01)
                            ),
                            column(width = 2, br(), uiOutput("correctnessW1"))),
                          fluidRow(
@@ -360,7 +383,8 @@ ui <- list(
                                     label = "Probability of Rain One Week from Now", 
                                     value = NA,
                                     min = 0,
-                                    max = 1)),
+                                    max = 1,
+                                    step = .01)),
                            column(width = 2, br(), uiOutput("correctnessW2"))),
                      fluidRow(
                        column(
@@ -370,7 +394,8 @@ ui <- list(
                            label = "Probability of Rain One Month from Now", 
                            value = NA,
                            min = 0,
-                           max = 1)),
+                           max = 1,
+                           step = .01)),
                        column(width = 2, br(), uiOutput("correctnessW3"))),
                      fluidRow(
                        column(
@@ -380,7 +405,8 @@ ui <- list(
                            label = "Probability of Rain One Year from Now", 
                            value = NA,
                            min = 0,
-                           max = 1)),
+                           max = 1,
+                           step = .01)),
                        
                        column(width = 2, br(), uiOutput("correctnessW4"))),
                      
@@ -389,7 +415,7 @@ ui <- list(
               column(
                 width = 6,
                 checkboxInput(inputId = "showWeatherPlots", 
-                              label = "Show sample weather plots"),
+                              label = "Show plots for weather sample paths"),
                 conditionalPanel( 
                   condition = "input.showWeatherPlots",
                   plotOutput("weatherDaily", height = '250px'), 
@@ -397,7 +423,7 @@ ui <- list(
                   plotOutput("weatherCumulativeProb", height = '300px'),
                   htmlOutput("weatherCumulativeAlt"),
                   bsButton(inputId  = "newWeatherPlotSamples", 
-                           label = "New Sample"))
+                           label = "New Sample Path"))
               )
             )
             ))),
@@ -486,6 +512,16 @@ server <- function(input, output, session) {
       type = "info"
     )
   })
+  
+  # Go button on Overview page
+  observeEvent(
+    eventExpr = input$go1, 
+    handlerExpr = { 
+      updateTabItems(session = session, 
+                     inputId = "pages", 
+                     selected = "Explore" 
+      ) 
+    })
   
   # Handles verification that the entered matrix is a probability matrix for 2x2 
   ogMat2 <- reactive({
@@ -600,25 +636,33 @@ server <- function(input, output, session) {
   output$correctnessW1 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$tomorrowProb1)) && 
                      round(input$tomorrowProb1,2) == 
-                     round(gameAns(game$correctMat, 1, 1),2))})
+                     round(gameAns(correctMat = game$correctMat, 
+                                   start = 1, 
+                                   pow = 1),2))}) 
   
   # Picture to go with weather question 2 (x or check)
   output$correctnessW2 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$weekProb1)) && 
                      round(input$weekProb1, 2) == 
-                     round(gameAns(game$correctMat, 1, 7), 2))})
+                     round(gameAns(correctMat = game$correctMat, 
+                                   start = 1, 
+                                   pow = 7), 2))})
   
   # Picture to go with weather question 3 (x or check)
   output$correctnessW3 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$monthProb1)) && 
                      round(input$monthProb1, 2) == 
-                     round(gameAns(game$correctMat, 1, 30), 2))})
+                     round(gameAns(correctMat = game$correctMat, 
+                                   start  = 1, 
+                                   pow = 30), 2))})
   
   # Picture to go with weather question 4 (x or check)
   output$correctnessW4 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$yearProb1)) && 
                      round(input$yearProb1, 2) == 
-                     round(gameAns(game$correctMat, 1, 365), 2))})
+                     round(gameAns(correctMat = game$correctMat, 
+                                   start = 1, 
+                                   pow = 365), 2))})
 
   # Show feedback after Check Game but reset to no feedback if any input is changed
   observeEvent(input$checkGame, {game$showFeedback <- T})
@@ -633,9 +677,8 @@ server <- function(input, output, session) {
   # Statement for the weather problem
   output$weatherProb <- renderText({
   paste("Every morning, Ben wakes up at 8am and looks out his window to check 
-  the weather. If it rains today tomorrow it will rain with probability", 
-  game$probW1, "If it doesn't rain today, then it will rain tomorrow with 
-  probability", game$probW2,".")})
+  the weather. If it rains today, it will rain tomorrow with probability", 
+  game$probW1, "If it doesn't rain today, then it will rain tomorrow with probability", game$probW2,".")})
   
   # When user clicks the New Problem button for the weather scenario
   observeEvent(input$newWeather, {
@@ -651,7 +694,30 @@ server <- function(input, output, session) {
     # Updates correct probability matrix based on above
     game$correctMat <- matrix(c(game$probW1, 1-game$probW1, 
                                 game$probW2, 1-game$probW2), 
-                              nrow = 2, byrow = TRUE)})
+                              nrow = 2, byrow = TRUE)
+    
+    # Clear inputs when generating a new problem
+    updateNumericInput(
+      session = session,
+      inputId = "tomorrowProb1",
+      value = NA
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "weekProb1",
+      value = NA
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "monthProb1",
+      value = NA
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "yearProb1",
+      value = NA
+    )
+    })
   
   # Do walk of 365 days for weather problem
   weatherSteps <- eventReactive(input$newWeatherPlotSamples, {
@@ -712,12 +778,16 @@ server <- function(input, output, session) {
                          names_to = "Rain", 
                          values_to = "Proportion")
     plot <- ggplot2::ggplot(aes(x = day, y = Proportion, color = Rain), data = data) +
-      geom_hline(aes(yintercept = 1 - gameAns(game$correctMat, 1, 365)), 
+      geom_hline(aes(yintercept = 1 - gameAns(correctMat = game$correctMat, 
+                                              start = 1, 
+                                              pow = 365)), 
                  color = boastPalette[1], 
                  linetype = "dashed", 
                  lwd = 1, 
                  show.legend = TRUE) +
-      geom_hline(aes(yintercept = gameAns(game$correctMat, 1, 365)), 
+      geom_hline(aes(yintercept = gameAns(correctMat = game$correctMat, 
+                                          start = 1, 
+                                          pow = 365)), 
                  color = boastPalette[2], 
                  linetype = "dashed", 
                  lwd = 1, 
@@ -784,7 +854,39 @@ server <- function(input, output, session) {
     game$correctMatSL <- matrix(c(game$probSLGG, game$probSLGY, game$probSLGR, 
                                   game$probSLYG, game$probSLYY, game$probSLYR,
                                   game$probSLRG, game$probSLRY, game$probSLRR), 
-                                nrow = 3, byrow = T)})
+                                nrow = 3, byrow = T)
+    # Clear inputs when generating a new problem
+    updateNumericInput(
+      session = session,
+      inputId = "TLG1",
+      value = NA
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "TLR1",
+      value = NA
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "TLG5",
+      value = NA
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "TLR5",
+      value = NA
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "TLG9",
+      value = NA
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "TLR9",
+      value = NA
+    )
+    })
 
   # Text for the traffic lights problem
   output$lightProb <- renderText({
@@ -807,37 +909,52 @@ server <- function(input, output, session) {
   output$correctnessLG1 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$TLG1)) && 
                      round(input$TLG1, 2) == 
-                     round(gameAns(game$correctMatSL, 1, 1), 2))})
+                     round(gameAns(correctMat = game$correctMatSL, 
+                                   start = 1, 
+                                   pow = 1), 2))})
   
   # Check or X for probability that the first light is red
   output$correctnessLR1 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$TLR1)) && 
                      round(input$TLR1, 2) == 
-                     round(gameAns(game$correctMatSL, 1, 1, col = 3), 2))})
+                     round(gameAns(correctMat = game$correctMatSL, 
+                                   start = 1, 
+                                   pow = 1, 
+                                   col = 3), 2))})
   
   # Check or X for probability that the fifth light is green
   output$correctnessLG5 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$TLG5)) && 
                      round(input$TLG5, 2) == 
-                     round(gameAns(game$correctMatSL, 1, 5), 2))})
+                     round(gameAns(correctMat = game$correctMatSL, 
+                                   start = 1, 
+                                   pow = 5), 2))})
 
   # Check or X for probability that the fifth light is red
   output$correctnessLR5 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$TLR5)) && 
                      round(input$TLR5, 2) == 
-                     round(gameAns(game$correctMatSL, 1, 5, col = 3), 2))})
+                     round(gameAns(correctMat = game$correctMatSL, 
+                                   start = 1, 
+                                   pow = 5, 
+                                   col = 3), 2))})
   
   # Check or X for probability that the last light is green
   output$correctnessLG9 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$TLG9)) && 
                      round(input$TLG9, 2) == 
-                     round(gameAns(game$correctMatSL, 1, 9), 2))})
+                     round(gameAns(correctMat = game$correctMatSL, 
+                                   start = 1, 
+                                   pow = 9), 2))})
   
   # Check or X for probability that the last light is red
   output$correctnessLR9 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$TLR9)) && 
                      round(input$TLR9, 2) == 
-                     round(gameAns(game$correctMatSL, 1, 9, col = 3), 2))})
+                     round(gameAns(correctMat = game$correctMatSL, 
+                                   start = 1, 
+                                   pow = 9, 
+                                   col = 3), 2))})
   
   # Controls feedback display
   # Show feedback if the button is pressed; hide feedback if the answers change
@@ -929,17 +1046,26 @@ server <- function(input, output, session) {
     plot <- ggplot2::ggplot(aes(x = day, y = Proportion, color = Color), 
                           data = data) +
       scale_colour_manual(values = c("#009E73", "red", "#E69F00")) +
-      geom_hline(aes(yintercept = gameAns(game$correctMatSL, 1, 100, col = 1)), 
+      geom_hline(aes(yintercept = gameAns(correctMat = game$correctMatSL, 
+                                          start = 1, 
+                                          pow = 100, 
+                                          col = 1)), 
                  lwd = 1, 
                  linetype = "dashed", 
                  color = "#009E73", 
                  show.legend = TRUE) +
-      geom_hline(aes(yintercept = gameAns(game$correctMatSL, 1, 100, col = 2)), 
+      geom_hline(aes(yintercept = gameAns(correctMat = game$correctMatSL, 
+                                          start = 1, 
+                                          pow = 100, 
+                                          col = 2)), 
                  lwd = 1, 
                  linetype = "dashed", 
                  color = "#E69F00", 
                  show.legend = TRUE) +
-      geom_hline(aes(yintercept = gameAns(game$correctMatSL, 1, 100, col = 3)), 
+      geom_hline(aes(yintercept = gameAns(correctMat = game$correctMatSL, 
+                                          start = 1, 
+                                          pow = 100, 
+                                          col = 3)), 
                  lwd = 1, 
                  linetype = "dashed", 
                  color = "red", 
@@ -998,28 +1124,31 @@ server <- function(input, output, session) {
   # Output check or X for first question (child 1)
   output$correctnessChild1 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$child1Prob)) && 
-                     round(input$child1Prob,2) == game$correctMatC[2,2])})
+                     round(input$child1Prob,2) == round(game$correctMatC[2,1],2))})
   
   # Output check or X for second question (child 5)
   output$correctnessChild5 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$child5Prob)) && 
                      round(input$child5Prob, 2) == 
-                     round(.5*gameAns(game$correctMatC, 1, 5) + 
-                             .5*gameAns(game$correctMatC, 2, 5), 2))})
+                     round(gameAns(correctMat = game$correctMatC, 
+                                        start = 2, 
+                                        pow = 5), 2))})
   
   # Output check or X for third question (child 10)
   output$correctnessChild10 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$child10Prob)) && 
                      round(input$child10Prob, 2) == 
-                     round(.5*gameAns(game$correctMatC, 1, 10) + 
-                             .5*gameAns(game$correctMatC, 2, 10), 2))})
+                     round(gameAns(correctMat = game$correctMatC, 
+                                        start = 2, 
+                                        pow = 10), 2))})
   
   # Output check or X for fourth question (child 20)
   output$correctnessChild20 <- renderUI(if(game$showFeedback){
     correctnessPic(!(is.na(input$child20Prob)) && 
                      round(input$child20Prob, 2) == 
-                     round(.5*gameAns(game$correctMatC, 1, 20) + 
-                             .5*gameAns(game$correctMatC, 2, 20), 2))})
+                     round(gameAns(correctMat = game$correctMatC, 
+                                        start = 2, 
+                                        pow = 20), 2))})
   
   # Control when feedback is displayed (only directly after pressing the button)
   observeEvent(input$checkCandy, {game$showFeedback <- T})
@@ -1027,6 +1156,8 @@ server <- function(input, output, session) {
   observeEvent(input$child5Prob, {game$showFeedback <- F})
   observeEvent(input$child10Prob, {game$showFeedback <- F})
   observeEvent(input$child20Prob, {game$showFeedback <- F})
+  observeEvent(input$problems, {game$showFeedback <- F})
+
   
   # When tabs switch, make sure feedback goes away and candy problem is updated
   observeEvent(input$pages, {
@@ -1043,6 +1174,28 @@ server <- function(input, output, session) {
     game$correctMatC <- matrix(c(game$probCandy, 1-game$probCandy, 
                                  1 - game$probCookie, game$probCookie),
                                nrow = 2, byrow = TRUE)
+    
+    # Clear inputs when generating a new problem
+    updateNumericInput(
+      session = session,
+      inputId = "child1Prob",
+      value = NA
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "child5Prob",
+      value = NA
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "child10Prob",
+      value = NA
+    )
+    updateNumericInput(
+      session = session,
+      inputId = "child20Prob",
+      value = NA
+    )
     })
   
   # Assigns all students a cookie or candy choice based on current probabilities
@@ -1104,12 +1257,16 @@ server <- function(input, output, session) {
                          values_to = "Proportion")
     plot <- ggplot2::ggplot(aes(x = day, y = Proportion, color = Choice), 
                           data = data) +
-      geom_hline(aes(yintercept = gameAns(game$correctMatC, 1, 365)), 
+      geom_hline(aes(yintercept = gameAns(correctMat = game$correctMatC, 
+                                          start = 1, 
+                                          pow = 365)), 
                  color = boastPalette[1], 
                  linetype = "dashed", 
                  lwd = 1, 
                  show.legend = TRUE) +
-      geom_hline(aes(yintercept = 1 - gameAns(game$correctMatC, 1, 365)), 
+      geom_hline(aes(yintercept = 1 - gameAns(correctMat = game$correctMatC, 
+                                              start = 1, 
+                                              pow = 365)), 
                  color = boastPalette[2], 
                  linetype = "dashed", 
                  lwd = 1, 
