@@ -9,9 +9,7 @@ Authors@R: c(
   )
 Chapter: Stochastic Processes
 Description: c(
-    "This app explores discrete time Markov Chains and their long run behavior",
-  "by considering multiple sample problems."
-  )
+    "This app explores discrete time Markov Chains and their long run behavior by considering multiple sample problems.")
 LearningObjectives: c()
 DisplayMode: Normal
 URL: https://psu-eberly.shinyapps.io/Markov_Chain_Convergence
