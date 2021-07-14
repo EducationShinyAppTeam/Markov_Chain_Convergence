@@ -22,7 +22,7 @@ APP_DESCP  <<- paste(
 # Input: boolean for whether the condition is true or false
 # Output: appropriate image
 correctnessPic <- function(condition){
-  if(condition){
+  if (condition) {
     renderIcon(icon = "correct", html = TRUE)
   }
   else{
@@ -603,16 +603,17 @@ server <- function(input, output, session) {
   observeEvent(
     eventExpr = input$go1, 
     handlerExpr = { 
-      updateTabItems(session = session, 
-                     inputId = "pages", 
-                     selected = "Explore" 
+      updateTabItems(
+        session = session, 
+        inputId = "pages", 
+        selected = "Explore" 
       ) 
     })
   
   # Handles verification that the entered matrix is a probability matrix for 2x2 
   ogMat2 <- reactive({
    validate(
-      need(min(input$ogMat2)>= 0 && sum(input$ogMat2[1,]) == 1 && 
+      need(min(input$ogMat2) >= 0 && sum(input$ogMat2[1,]) == 1 && 
              sum(input$ogMat2[2,]) == 1, 
            "Rows must be non-negative and sum to 1")
       )
@@ -622,7 +623,7 @@ server <- function(input, output, session) {
   # Handles verification that the entered matrix is a probability matrix for 3x3 
   ogMat3 <- reactive({
     validate(
-      need(min(input$ogMat3)>= 0 && sum(input$ogMat3[1,]) == 1 && 
+      need(min(input$ogMat3) >= 0 && sum(input$ogMat3[1,]) == 1 && 
              sum(input$ogMat3[2,]) == 1 && sum(input$ogMat3[3,]) == 1, 
            "Rows must sum to 1")
     )
@@ -632,7 +633,7 @@ server <- function(input, output, session) {
   # Handles verification that the entered matrix is a probability matrix for 4x4 
   ogMat4 <- reactive({
     validate(
-      need(min(input$ogMat4)>= 0 && sum(input$ogMat4[1,]) == 1 && 
+      need(min(input$ogMat4) >= 0 && sum(input$ogMat4[1,]) == 1 && 
              sum(input$ogMat4[2,]) == 1 && sum(input$ogMat4[3,]) == 1 && 
              sum(input$ogMat4[4,]) == 1, 
            "Rows must sum to 1")
@@ -643,9 +644,9 @@ server <- function(input, output, session) {
   # Handles verification that the entered matrix is a probability matrix for 5x5
   ogMat5 <- reactive({
     validate(
-      need(min(input$ogMat5)>= 0 && sum(input$ogMat5[1,]) == 1 && 
+      need(min(input$ogMat5) >= 0 && sum(input$ogMat5[1,]) == 1 && 
              sum(input$ogMat5[2,]) == 1 && sum(input$ogMat5[3,]) == 1 && 
-             sum(input$ogMat5[4,]) == 1&& sum(input$ogMat5[5,]) == 1, 
+             sum(input$ogMat5[4,]) == 1 && sum(input$ogMat5[5,]) == 1, 
            "Rows must sum to 1")
     )
     input$ogMat5
@@ -653,13 +654,13 @@ server <- function(input, output, session) {
   
   # Gets the current probability matrix for the calculator based on number of rows
   getCurrentMatrix <- reactive({
-    if(as.numeric(input$nrows) == 2){
+    if (as.numeric(input$nrows) == 2) {
         ogMat2()
     }
-    else if(as.numeric(input$nrows) == 3){
+    else if (as.numeric(input$nrows) == 3) {
       ogMat3()
     }
-    else if(as.numeric(input$nrows) == 4){
+    else if (as.numeric(input$nrows) == 4) {
       ogMat4()
     }
     else{
@@ -669,20 +670,20 @@ server <- function(input, output, session) {
   
   # Updates the matrix when the Calculate Matrix button is pressed
   updateMatrix <- eventReactive(input$subMat, {
-    if(input$nrows == 2){
+    if (input$nrows == 2) {
       expr = as.data.frame(matrixcalc::matrix.power(ogMat2(),
                                                   as.integer(input$steps)), 
                          row.names = 0:1,
                          optional = TRUE)} 
-    else if (input$nrows == 3){
+    else if (input$nrows == 3) {
       as.data.frame(matrixcalc::matrix.power(ogMat3(),as.integer(input$steps)), 
                     row.names = 0:2, 
                     optional = TRUE)}
-    else if(input$nrows == 4){
+    else if (input$nrows == 4) {
       as.data.frame(matrixcalc::matrix.power(ogMat4(), as.integer(input$steps)), 
                     row.names = 0:3, 
                     optional = TRUE)} 
-    else{
+    else {
       as.data.frame(matrixcalc::matrix.power(ogMat5(),as.integer(input$steps)), 
                     row.names = 0:4, 
                     optional = TRUE)}})
@@ -707,8 +708,8 @@ server <- function(input, output, session) {
   weatherVars <- reactive({
     game$probW1 <- sample(c(.5, .6, .7, .8, .9), size = 1, replace = T)
     game$probW2 <- sample(c(.5, .4, .3, .2, .1), size = 1, replace = T)
-    game$correctMat <- matrix(c(game$probW1, 1-game$probW1, 
-                                game$probW2, 1-game$probW2),
+    game$correctMat <- matrix(c(game$probW1, 1 - game$probW1, 
+                                game$probW2, 1 - game$probW2),
                               nrow = 2, byrow = TRUE)
   })
   
@@ -719,7 +720,7 @@ server <- function(input, output, session) {
   }
   
   # Picture to go with weather question 1 (x or check)
-  output$correctnessW1 <- renderUI(if(game$showFeedback){
+  output$correctnessW1 <- renderUI(if (game$showFeedback) {
     correctnessPic(!(is.na(input$tomorrowProb1)) && 
                      round(input$tomorrowProb1,2) == 
                      round(gameAns(correctMat = game$correctMat, 
@@ -727,7 +728,7 @@ server <- function(input, output, session) {
                                    pow = 1),2))}) 
   
   # Picture to go with weather question 2 (x or check)
-  output$correctnessW2 <- renderUI(if(game$showFeedback){
+  output$correctnessW2 <- renderUI(if (game$showFeedback) {
     correctnessPic(!(is.na(input$weekProb1)) && 
                      round(input$weekProb1, 2) == 
                      round(gameAns(correctMat = game$correctMat, 
@@ -735,7 +736,7 @@ server <- function(input, output, session) {
                                    pow = 7), 2))})
   
   # Picture to go with weather question 3 (x or check)
-  output$correctnessW3 <- renderUI(if(game$showFeedback){
+  output$correctnessW3 <- renderUI(if (game$showFeedback) {
     correctnessPic(!(is.na(input$monthProb1)) && 
                      round(input$monthProb1, 2) == 
                      round(gameAns(correctMat = game$correctMat, 
@@ -743,7 +744,7 @@ server <- function(input, output, session) {
                                    pow = 30), 2))})
   
   # Picture to go with weather question 4 (x or check)
-  output$correctnessW4 <- renderUI(if(game$showFeedback){
+  output$correctnessW4 <- renderUI(if (game$showFeedback) {
     correctnessPic(!(is.na(input$yearProb1)) && 
                      round(input$yearProb1, 2) == 
                      round(gameAns(correctMat = game$correctMat, 
@@ -773,13 +774,13 @@ server <- function(input, output, session) {
     game$probW1 <- sample(.1*(2:9), size = 1, replace = T) # Updates probabilities
     # Decides on the probability of no rain after rain; 
     # make sure it is less than rain to rain
-    if(game$probW1 == .2){options <- (.01*(1:10))}
+    if (game$probW1 == .2) {options <- (.01*(1:10))}
     else{options <- .1*(1:(ceiling(game$probW1*5)))}
     game$probW2 <- sample(options, size = 1, replace = T)
     
     # Updates correct probability matrix based on above
-    game$correctMat <- matrix(c(game$probW1, 1-game$probW1, 
-                                game$probW2, 1-game$probW2), 
+    game$correctMat <- matrix(c(game$probW1, 1 - game$probW1, 
+                                game$probW2, 1 - game$probW2), 
                               nrow = 2, byrow = TRUE)
     
     # Clear inputs when generating a new problem
@@ -813,17 +814,17 @@ server <- function(input, output, session) {
     rainSum <- c(1)
     
     # For each day, sample either rain or not based on the day before
-    for(x in 1:365){
-      curState <- sample(c(0,1), 1, replace = TRUE, prob = game$correctMat[curState+1,])
+    for (x in 1:365) {
+      curState <- sample(c(0,1), 1, replace = TRUE, prob = game$correctMat[curState + 1,])
       states <- c(states, curState)
-      rainSum <- c(rainSum, rainSum[x]+1-curState)
+      rainSum <- c(rainSum, rainSum[x] + 1 - curState)
     }
     
     # Return a data frame with the samples
     data.frame(day = index, 
                state = states, 
-               Rain = rainSum/(index+1), 
-               None = 1 - rainSum/(index+1))
+               Rain = rainSum/(index + 1), 
+               None = 1 - rainSum/(index + 1))
   })
   
   # Create the daily weather plot for first week
@@ -834,7 +835,7 @@ server <- function(input, output, session) {
         xlab("Day Number") + 
         ylab('State') +
         scale_y_continuous(breaks = 0:1, labels = c("Rain", "No Rain")) +
-        ggtitle("States by Day Over the First Month")+
+        ggtitle("States by Day Over the First Month") +
         theme(axis.text = element_text(size = 18),
               plot.title = element_text(size = 18, face = "bold"),
               axis.title = element_text(size = 18),
@@ -882,7 +883,7 @@ server <- function(input, output, session) {
       geom_path(lwd = 1) +
       xlab("Day Number") + 
       ylab('Cumulative portion of rainy days') +
-      ggtitle("Portion of Days of Rain Over Time")+
+      ggtitle("Portion of Days of Rain Over Time") +
       theme(axis.text = element_text(size = 18),
             plot.title = element_text(size = 18, face = "bold"),
             axis.title = element_text(size = 18),
@@ -992,7 +993,7 @@ server <- function(input, output, session) {
   })
   
   # Check or X for probability that the first light is green
-  output$correctnessLG1 <- renderUI(if(game$showFeedback){
+  output$correctnessLG1 <- renderUI(if (game$showFeedback) {
     correctnessPic(!(is.na(input$TLG1)) && 
                      round(input$TLG1, 2) == 
                      round(gameAns(correctMat = game$correctMatSL, 
@@ -1000,7 +1001,7 @@ server <- function(input, output, session) {
                                    pow = 1), 2))})
   
   # Check or X for probability that the first light is red
-  output$correctnessLR1 <- renderUI(if(game$showFeedback){
+  output$correctnessLR1 <- renderUI(if (game$showFeedback) {
     correctnessPic(!(is.na(input$TLR1)) && 
                      round(input$TLR1, 2) == 
                      round(gameAns(correctMat = game$correctMatSL, 
@@ -1009,7 +1010,7 @@ server <- function(input, output, session) {
                                    col = 3), 2))})
   
   # Check or X for probability that the fifth light is green
-  output$correctnessLG5 <- renderUI(if(game$showFeedback){
+  output$correctnessLG5 <- renderUI(if (game$showFeedback) {
     correctnessPic(!(is.na(input$TLG5)) && 
                      round(input$TLG5, 2) == 
                      round(gameAns(correctMat = game$correctMatSL, 
@@ -1017,7 +1018,7 @@ server <- function(input, output, session) {
                                    pow = 5), 2))})
 
   # Check or X for probability that the fifth light is red
-  output$correctnessLR5 <- renderUI(if(game$showFeedback){
+  output$correctnessLR5 <- renderUI(if (game$showFeedback) {
     correctnessPic(!(is.na(input$TLR5)) && 
                      round(input$TLR5, 2) == 
                      round(gameAns(correctMat = game$correctMatSL, 
@@ -1026,7 +1027,7 @@ server <- function(input, output, session) {
                                    col = 3), 2))})
   
   # Check or X for probability that the last light is green
-  output$correctnessLG9 <- renderUI(if(game$showFeedback){
+  output$correctnessLG9 <- renderUI(if (game$showFeedback) {
     correctnessPic(!(is.na(input$TLG9)) && 
                      round(input$TLG9, 2) == 
                      round(gameAns(correctMat = game$correctMatSL, 
@@ -1034,7 +1035,7 @@ server <- function(input, output, session) {
                                    pow = 9), 2))})
   
   # Check or X for probability that the last light is red
-  output$correctnessLR9 <- renderUI(if(game$showFeedback){
+  output$correctnessLR9 <- renderUI(if (game$showFeedback) {
     correctnessPic(!(is.na(input$TLR9)) && 
                      round(input$TLR9, 2) == 
                      round(gameAns(correctMat = game$correctMatSL, 
@@ -1067,18 +1068,18 @@ server <- function(input, output, session) {
     yellows <- c(0)
     
     # For each light, sample the outcome based on the previous light
-    for(x in 1:10){
+    for (x in 1:10) {
       curState <- sample(c(0,1,2), 1, 
                          replace = TRUE, 
-                         prob = game$correctMatSL[curState+1,])
+                         prob = game$correctMatSL[curState + 1,])
       states <- c(states, curState)
-      if(curState == 0){
+      if (curState == 0) {
         Green <- Green + 1
       }
-      else if(curState == 1){
+      else if (curState == 1) {
         Yellow <- Yellow + 1
       }
-      else{
+      else {
         Red <- Red + 1
       }
       reds <- c(reds, Red)
@@ -1102,7 +1103,7 @@ server <- function(input, output, session) {
       xlab("Light Number") + 
       ylab('State') +
       scale_y_continuous(breaks = 0:2, labels = c("Green", "Yellow", "Red")) +
-      ggtitle("States by Light Number")+
+      ggtitle("States by Light Number") +
       theme(axis.text = element_text(size = 18),
             plot.title = element_text(size = 18, face = "bold"),
             axis.title = element_text(size = 18),
@@ -1160,7 +1161,7 @@ server <- function(input, output, session) {
       geom_point(aes(shape = Color), size = 3) +
       xlab("Light number") + 
       ylab('Cumulative proportions') +
-      ggtitle("Portion of Light Colors Over Time")+
+      ggtitle("Portion of Light Colors Over Time") +
       theme(axis.text = element_text(size = 18),
             plot.title = element_text(size = 18, face = "bold"),
             axis.title = element_text(size = 18),
@@ -1187,7 +1188,7 @@ server <- function(input, output, session) {
   createCandy <- reactive({
     game$probCandy <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
     game$probCookie <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
-    game$correctMatC <- matrix(c(game$probCandy, 1-game$probCandy, 
+    game$correctMatC <- matrix(c(game$probCandy, 1 - game$probCandy, 
                                  1 - game$probCookie, game$probCookie),
                               nrow = 2, byrow = TRUE)
   })
@@ -1208,12 +1209,12 @@ server <- function(input, output, session) {
     first student chooses a cookie, calculate the following probabilities.")})
 
   # Output check or X for first question (child 1)
-  output$correctnessChild1 <- renderUI(if(game$showFeedback){
+  output$correctnessChild1 <- renderUI(if (game$showFeedback) {
     correctnessPic(!(is.na(input$child1Prob)) && 
                      round(input$child1Prob,2) == round(game$correctMatC[2,1],2))})
   
   # Output check or X for second question (child 5)
-  output$correctnessChild5 <- renderUI(if(game$showFeedback){
+  output$correctnessChild5 <- renderUI(if (game$showFeedback) {
     correctnessPic(!(is.na(input$child5Prob)) && 
                      round(input$child5Prob, 2) == 
                      round(gameAns(correctMat = game$correctMatC, 
@@ -1221,7 +1222,7 @@ server <- function(input, output, session) {
                                         pow = 5), 2))})
   
   # Output check or X for third question (child 10)
-  output$correctnessChild10 <- renderUI(if(game$showFeedback){
+  output$correctnessChild10 <- renderUI(if (game$showFeedback) {
     correctnessPic(!(is.na(input$child10Prob)) && 
                      round(input$child10Prob, 2) == 
                      round(gameAns(correctMat = game$correctMatC, 
@@ -1229,7 +1230,7 @@ server <- function(input, output, session) {
                                         pow = 10), 2))})
   
   # Output check or X for fourth question (child 20)
-  output$correctnessChild20 <- renderUI(if(game$showFeedback){
+  output$correctnessChild20 <- renderUI(if (game$showFeedback) {
     correctnessPic(!(is.na(input$child20Prob)) && 
                      round(input$child20Prob, 2) == 
                      round(gameAns(correctMat = game$correctMatC, 
@@ -1257,7 +1258,7 @@ server <- function(input, output, session) {
     game$showFeedback <- F
     game$probCandy <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
     game$probCookie <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
-    game$correctMatC <- matrix(c(game$probCandy, 1-game$probCandy, 
+    game$correctMatC <- matrix(c(game$probCandy, 1 - game$probCandy, 
                                  1 - game$probCookie, game$probCookie),
                                nrow = 2, byrow = TRUE)
     
@@ -1291,11 +1292,11 @@ server <- function(input, output, session) {
     states <- c(1)
     cookieSum <- c(1)
     # Loop through all remaining students
-    for(x in 2:20){
+    for (x in 2:20) {
       curState <- sample(c(0,1), 1, replace = TRUE, 
-                         prob = game$correctMatC[curState+1,])
+                         prob = game$correctMatC[curState + 1,])
       states <- c(states, curState)
-      cookieSum <- c(cookieSum, cookieSum[x-1] + curState)
+      cookieSum <- c(cookieSum, cookieSum[x - 1] + curState)
     }
     
     # Return data frame of data generated by the simulation
@@ -1313,7 +1314,7 @@ server <- function(input, output, session) {
       xlab("Student") +
       ylab('State') +
       scale_y_continuous(breaks = 0:1, labels = c("Candy", "Cookie")) +
-      ggtitle("Children's Choices")+
+      ggtitle("Children's Choices") +
       theme(axis.text = element_text(size = 18),
             plot.title = element_text(size = 18, face = "bold"),
             axis.title = element_text(size = 18),

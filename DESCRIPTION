@@ -3,7 +3,9 @@ ShortName: MC Convergence
 Date: 2020-12-17
 Lifecycle: experimental
 Authors@R: c(
-    person(given = "Leah", family = "Hunt", email = "lmh5964@psu.edu", role = c("aut", "cre"))
+    person(given = "Leah", family = "Hunt", email = "lmh5964@psu.edu", role = c("aut", "cre")), 
+    person(given = "Shravani", family = "Samala", email = "sjs7049@psu.edu", role = c("ctb"))
+    
   )
 Chapter: Stochastic Processes
 Description: c(
