@@ -33,27 +33,28 @@ correctnessPic <- function(condition){
 # Define UI for App
 ui <- list(
   useShinyjs(),
-  tags$head(
-    tags$link(rel = "stylesheet", type = "text/css",
-  href = "https://educationshinyappteam.github.io/Style_Guide/theme/boast.css")
-  ),
+  # tags$head(
+  #   tags$link(rel = "stylesheet", type = "text/css",
+  # href = "https://educationshinyappteam.github.io/Style_Guide/theme/boast.css")
+  # ),
   ## Create the app page
   dashboardPage(
     skin = "blue",
     ### Create the app header
     dashboardHeader(
       title = "MC Convergence", 
+      titleWidth = 250,
       tags$li(class = "dropdown", actionLink("info", icon("info"))),
       tags$li(
         class = "dropdown",
-        tags$a(target = "_blank", 
-               icon("comments"),
-               href = "https://pennstate.qualtrics.com/jfe/form/SV_7TLIkFtJEJ7fEPz?appName = Markov_Chain_Convergence"
-        )
+        boastUtils::surveyLink(name = "Markov_Chain_Convergence")
       ),
-      tags$li(class = "dropdown",
-              tags$a(href = 'https://shinyapps.science.psu.edu/',
-                     icon("home")))
+      tags$li(
+        class = "dropdown",
+        tags$a(href = 'https://shinyapps.science.psu.edu/',
+               icon("home")
+        )
+      )
     ),
     ### Create the sidebar/left navigation menu
     dashboardSidebar(
@@ -65,7 +66,7 @@ ui <- list(
       ),
       tags$div(
         class = "sidebar-logo",
-        boastUtils::psu_eberly_logo("reversed")
+        boastUtils::sidebarFooter()
       )
     ),
     ### Create the content
@@ -98,17 +99,18 @@ ui <- list(
               label = "GO!",
               size = "large",
               icon = icon("bolt")
-          )
+            )
           ),
           br(), 
           br(), 
           h2("Acknowledgements"), 
-          p("This app was developed and coded by Leah Hunt."),
+          p("This app was developed and coded by Leah Hunt and updated in 2021
+             by Shravani Samala"),
             br(), 
             br(), 
             br(), 
             div(class = "updated", 
-                "Last Update: 11/13/2020 by LMH.")
+                "Last Update: 7/13/2020 by SJS.")
         ), 
 
         #### Set up an Explore Page
@@ -124,7 +126,7 @@ ui <- list(
             your probability matrix then fill in the transition probabilities. 
             Note that since this is a probability matrix, the rows must sum to 1. 
             The Number of Steps allows you to choose how many steps in the future
-            to consider the matrix, i.e. the calculator with take your 
+            to consider the matrix, i.e. the calculator will take your 
             probability matrix to the nth power."
           ),
           p(
@@ -133,229 +135,290 @@ ui <- list(
             Notice the rate at which the chain approaches long run behavior in  
             each problem."
           ),
-          
+          br(), 
           fluidRow(
-            # Title
-            titlePanel("Transition Probability Calculator"),
-            sidebarLayout(
-              sidebarPanel(
-                # Input for number of rows in the matrix
-                selectInput(inputId = "nrows", 
-                            label = "Number of States in the Matrix:", 
-                            choices = c(2,3,4,5), 
-                            selected = 2),
-                
-                # Input to select current state of the matrix conditional on the 
-                # matrix size
-                conditionalPanel(
-                  condition = "input.nrows == 2", 
-                  matrixInput(inputId = "ogMat2", 
-                              value  = matrix(diag(2), 
-                                              nrow = 2, 
-                                              dimnames = list(0:1, 0:1)), 
-                              rows = list(names = TRUE), 
-                              cols = list( names = TRUE), 
-                              class = "numeric")
+            column(
+              width = 12, 
+              titlePanel("Transition Probability Calculator"),
+              sidebarLayout(
+                sidebarPanel(
+                  # Input for number of rows in the matrix
+                  selectInput(
+                    inputId = "nrows", 
+                    label = "Number of States in the Matrix:", 
+                    choices = c(2,3,4,5), 
+                    selected = 2),
+                  
+                  # Input to select current state of the matrix conditional on the 
+                  # matrix size
+                  conditionalPanel(
+                    condition = "input.nrows == 2", 
+                    matrixInput(
+                      inputId = "ogMat2", 
+                      value  = matrix(diag(2), nrow = 2, dimnames = list(0:1, 0:1)), 
+                      rows = list(names = TRUE), 
+                      cols = list( names = TRUE), 
+                      class = "numeric")
+                    ),
+                  conditionalPanel(
+                    condition = "input.nrows == 3",
+                    matrixInput(
+                      inputId = "ogMat3", 
+                      value = matrix(diag(3), nrow = 3, dimnames = list(0:2, 0:2)), 
+                      rows = list(names = TRUE), 
+                      cols = list( names = TRUE), 
+                      class = "numeric")
                   ),
-                conditionalPanel(
-                  condition = "input.nrows == 3",
-                  matrixInput(inputId = "ogMat3", 
-                              value = matrix(diag(3), 
-                                             nrow = 3, 
-                                             dimnames = list(0:2, 0:2)), 
-                              rows = list(names = TRUE), 
-                              cols = list( names = TRUE), 
-                              class = "numeric")
-                ),
-                conditionalPanel(
-                  condition = "input.nrows == 4",
-                  matrixInput(inputId = "ogMat4", 
-                              value = matrix(diag(4), 
-                                             nrow = 4, 
-                                             dimnames = list(0:3, 0:3)), 
-                              rows = list(names = TRUE),
-                              cols = list( names = TRUE), 
-                              class = "numeric" )
-                ),
-                conditionalPanel(
-                  condition = "input.nrows == 5",
-                  matrixInput(inputId = "ogMat5", 
-                              value = matrix(diag(5), 
-                                             nrow = 5, 
-                                             dimnames = list(0:4, 0:4)), 
-                              rows = list(names = TRUE), 
-                              cols = list( names = TRUE), 
-                              class = "numeric" )
-                ),
-                conditionalPanel(
-                  condition = "input.nrows > 5 | input.nrows < 2",
-                  "This number of rows is not supported."
+                  conditionalPanel(
+                    condition = "input.nrows == 4",
+                    matrixInput(
+                      inputId = "ogMat4", 
+                      value = matrix(diag(4), nrow = 4, dimnames = list(0:3, 0:3)), 
+                      rows = list(names = TRUE),
+                      cols = list( names = TRUE), 
+                      class = "numeric" )
+                  ),
+                  conditionalPanel(
+                    condition = "input.nrows == 5",
+                    matrixInput(
+                      inputId = "ogMat5", 
+                      value = matrix(diag(5), nrow = 5, dimnames = list(0:4, 0:4)), 
+                      rows = list(names = TRUE), 
+                      cols = list( names = TRUE), 
+                      class = "numeric" )
+                  ),
+                  conditionalPanel(
+                    condition = "input.nrows > 5 | input.nrows < 2",
+                    "This number of rows is not supported."
+                  ),
+                  
+                  # Input for number of steps to take
+                  numericInput(
+                    inputId = "steps", 
+                     label = "Number of steps", 
+                     min = 1, 
+                     max = 10000, 
+                     value = 1, 
+                     step = 1),
+                  bsButton(
+                    inputId = "subMat", 
+                    label = "Calculate Matrix")
                 ),
                 
-                # Input for number of steps to take
-                numericInput(inputId = "steps", 
-                             label = "Number of steps", 
-                             min = 1, 
-                             max = 10000, 
-                             value = 1, 
-                             step = 1),
-                bsButton(inputId = "subMat", 
-                         label = "Calculate Matrix")
-              ),
-              
-              # Outputs: plot of states visited and the matrix to the n-steps power
-              mainPanel(
-                conditionalPanel(
-                  condition = "!input.subMat",
-                  p("To see the matrix x steps out, click the Calculate Matrix 
-                    button.")
-                ),
-                textOutput("matlabel"),
-                tableOutput("mat")
+                # Outputs: plot of states visited and the matrix to the n-steps power
+                mainPanel(
+                  conditionalPanel(
+                    condition = "!input.subMat",
+                    p("To see the matrix x steps out, click the Calculate Matrix 
+                      button.")
+                  ),
+                  textOutput("matlabel"),
+                  tableOutput("mat")
+                )
               )
             )
-            ),
+          ),
+          br(), 
           tabsetPanel(
             id = "problems",
             tabPanel(
-               title = "Candy",
-          h2("Candy or Cookies"),
-          textOutput("candyProb"),
-          br(),
-          fluidRow(
-            column(
-              width = 5,
-              fluidRow(
-                column(width = 10, 
-              numericInput(
-                inputId = "child1Prob", 
-                label = "Probability that the next child chooses candy", 
-                value = NA,
-                min = 0,
-                max = 1,
-                step = .01)
-              ),
-              column(width = 2, br(), uiOutput("correctnessChild1"))),
-              fluidRow(
+              title = "Candy",
+                h2("Candy or Cookies"),
+                textOutput("candyProb"),
+                br(),
+                fluidRow(
+                  column(
+                    width = 5,
+                    fluidRow(
+                      column(width = 10, 
+                        numericInput(
+                          inputId = "child1Prob", 
+                          label = "Probability that the next child chooses candy", 
+                          value = NA,
+                          min = 0,
+                          max = 1,
+                          step = .01)
+                        ),
+                        column(width = 2, 
+                               br(), 
+                               uiOutput("correctnessChild1"))),
+                    fluidRow(
+                      column(
+                        width = 10, 
+                        numericInput(
+                          inputId = "child5Prob", 
+                          label = "Probability that the fifth child chooses candy", 
+                          value = NA,
+                          min = 0,
+                          max = 1,
+                          step = .01)
+                      ),
+                      column(width = 2, 
+                             br(), 
+                             uiOutput("correctnessChild5"))),
+                    fluidRow(
+                      column(
+                        width = 10, 
+                          numericInput(
+                            inputId = "child10Prob", 
+                             label = "Probability that the tenth child chooses 
+                                      candy", 
+                             value = NA,
+                             min = 0,
+                             max = 1,
+                             step = .01)),
+                      column(
+                        width = 2, 
+                        br(), 
+                        uiOutput("correctnessChild10"))),
+                    fluidRow(
+                      column(
+                        width = 10, 
+                        numericInput(
+                          inputId = "child20Prob", 
+                          label = "Probability that the last child chooses candy", 
+                          value = NA,
+                          min = 0,
+                          max = 1,
+                          step = .01)),
+                      column(
+                        width = 2,
+                        br(), 
+                        uiOutput("correctnessChild20"))),
+                    
+                actionButton(
+                  inputId = "checkCandy", 
+                  label = "Check Answer"),
+                actionButton(
+                  inputId = "newCandy", 
+                  label = "New Problem")),
                 column(
-                  width = 10, 
-                  numericInput(
-                    inputId = "child5Prob", 
-                    label = "Probability that the fifth child chooses candy", 
-                    value = NA,
-                    min = 0,
-                    max = 1,
-                    step = .01)
+                  width = 7,
+                    checkboxInput(
+                      inputId = "showCandyPlots", 
+                      label = "Show plots for candy sample paths"),
+                    conditionalPanel( 
+                     condition = "input.showCandyPlots",
+                     plotOutput("candyDaily", height = '250px'), 
+                     htmlOutput("candyDailyAlt"),
+                     plotOutput("candyCumulativeProb", height = '300px'),
+                     htmlOutput("candyCumulativeAlt"),
+                     actionButton(
+                       inputId = "newCandyPlotSamples", 
+                       label = "New Sample Path"))
+                    )
+                  )
                 ),
-                column(width = 2, br(), uiOutput("correctnessChild5"))),
-              fluidRow(
-                column(width = 10, 
-              numericInput(inputId = "child10Prob", 
-                           label = "Probability that the tenth child chooses candy", 
-                           value = NA,
-                           min = 0,
-                           max = 1,
-                           step = .01)),
-              column(width = 2, br(), uiOutput("correctnessChild10"))),
-              fluidRow(
-                column(
-                  width = 10, 
-                  numericInput(
-                    inputId = "child20Prob", 
-                    label = "Probability that the last child chooses candy", 
-                    value = NA,
-                    min = 0,
-                    max = 1,
-                    step = .01)),
-                column(width = 2, br(), uiOutput("correctnessChild20"))),
-              
-          actionButton("checkCandy", "Check Answer"),
-          actionButton("newCandy", "New Problem")),
-          column(width = 7,
-                 checkboxInput("showCandyPlots", "Show plots for candy sample paths"),
-                 conditionalPanel( 
-                   condition = "input.showCandyPlots",
-                   plotOutput("candyDaily", height = '250px'), 
-                   htmlOutput("candyDailyAlt"),
-                   plotOutput("candyCumulativeProb", height = '300px'),
-                   htmlOutput("candyCumulativeAlt"),
-                   actionButton("newCandyPlotSamples", "New Sample Path"))
-                 )
-          
-          )),
           tabPanel(
             title = "Traffic Lights",
             h2("Traffic Lights"),
             textOutput("lightProb"),
             br(),
             fluidRow(
-              column(width = 4,
-                     numericInput(inputId = "TLG1", 
-                                  label = "Probability of Next Light Green", 
-                                  value = NA,
-                                  min = 0,
-                                  max = 1,
-                                  step = .01)),
-              column(width = 1, br(), uiOutput("correctnessLG1")),
-              column(width = 4,
-                     numericInput(inputId = "TLR1", 
-                                  label = "Probability of Next Light Red", 
-                                  value = NA,
-                                  min = 0,
-                                  max = 1,
-                                  step = .01)),
-              column(width = 1, br(), uiOutput("correctnessLR1"))),
+              column(
+                width = 4,
+                numericInput(
+                  inputId = "TLG1", 
+                  label = "Probability of Next Light Green", 
+                  value = NA,
+                  min = 0,
+                  max = 1,
+                  step = .01)),
+              column(
+                width = 1, 
+                br(), 
+                uiOutput("correctnessLG1")),
+              column(
+                width = 4,
+                numericInput(
+                  inputId = "TLR1", 
+                  label = "Probability of Next Light Red", 
+                  value = NA,
+                  min = 0,
+                  max = 1,
+                  step = .01)),
+              column(
+                width = 1,
+                br(),
+                uiOutput("correctnessLR1"))),
             fluidRow(  
               column(
                 width = 4,
-                numericInput(inputId = "TLG5", 
-                             label = "Probability of Fifth Light from Now Green", 
-                             value = NA,
-                             min = 0,
-                             max = 1,
-                             step = .01)
-                     ),
-              column(width = 1, br(), uiOutput("correctnessLG5")),
-              column(
-                width = 4,
-                numericInput(inputId = "TLR5", 
-                             label = "Probability of Fifth Light from Now Red", 
-                             value = NA,
-                             min = 0,
-                             max = 1,
-                             step = .01)),
-              column(width = 1, br(), uiOutput("correctnessLR5"))
-            ),
-            fluidRow(  
-              column(width = 4,
-                     numericInput(inputId = "TLG9", 
-                                  label = "Probability of Last Light Green", 
-                                  value = NA,
-                                  min = 0,
-                                  max = 1,
-                                  step = .01)
+                numericInput(
+                  inputId = "TLG5", 
+                  label = "Probability of Fifth Light from Now Green", 
+                  value = NA,
+                  min = 0,
+                  max = 1,
+                  step = .01)
               ),
-              column(width = 1, br(), uiOutput("correctnessLG9")),
-              column(width = 4,
-                     numericInput(inputId = "TLR9", 
-                                  label = "Probability of Last Light Red", 
-                                  value = NA,
-                                  min = 0,
-                                  max = 1,
-                                  step = .01)),
-              column(width = 1, br(), uiOutput("correctnessLR9"))
+              column(
+                width = 1,
+                br(), 
+                uiOutput("correctnessLG5")),
+              column(
+                width = 4,
+                numericInput(
+                  inputId = "TLR5", 
+                  label = "Probability of Fifth Light from Now Red", 
+                  value = NA,
+                  min = 0,
+                  max = 1,
+                  step = .01)),
+              column(
+                width = 1,
+                br(), 
+                uiOutput("correctnessLR5"))
             ),
-            actionButton("checkGameLights", "Check Answer"),
-            actionButton("newLights", "New Problem"),
-            checkboxInput("showLightPlots", "Show plots for light sample paths"),
+            fluidRow(  
+              column(
+                width = 4,
+                numericInput(
+                  inputId = "TLG9", 
+                  label = "Probability of Last Light Green", 
+                  value = NA,
+                  min = 0,
+                  max = 1,
+                  step = .01)
+              ),
+              column(
+                width = 1,
+                br(),
+                uiOutput("correctnessLG9")),
+              column(
+                width = 4,
+                numericInput(
+                  inputId = "TLR9", 
+                  label = "Probability of Last Light Red", 
+                  value = NA,
+                  min = 0,
+                  max = 1,
+                  step = .01)),
+              column(
+                width = 1,
+                br(), 
+                uiOutput("correctnessLR9"))
+            ),
+            actionButton(
+              inputId = "checkGameLights", 
+              label = "Check Answer"),
+            actionButton(
+              inputId = "newLights", 
+              label = "New Problem"),
+            checkboxInput(
+              inputId = "showLightPlots", 
+              label = "Show plots for light sample paths"),
             conditionalPanel( 
               condition = "input.showLightPlots",
               plotOutput("lightDaily", height = '250px'),
               htmlOutput("lightDailyAlt"),
               plotOutput("lightCumulativeProb", height = '300px'),
               htmlOutput("lightCumulativeAlt"),
-              actionButton("newLightPlotSamples", "New Sample Path"))
+              actionButton(
+                inputId = "newLightPlotSamples", 
+                label = "New Sample Path"))
           ),
+          
           tabPanel(
             title = "Weather",
             h2("Rain or No Rain"),
@@ -363,71 +426,89 @@ ui <- list(
             p("Today, it rained. Calculate the probability that it will rain 
               each of the following days."),
             fluidRow(
-              column(width = 5,
-                         fluidRow(
-                           column(
-                             width = 10, 
-                             numericInput(inputId = "tomorrowProb1", 
-                                          label = "Probability of Rain Tomorrow", 
-                                          value = NA,
-                                          min = 0,
-                                          max = 1,
-                                          step = .01)
-                           ),
-                           column(width = 2, br(), uiOutput("correctnessW1"))),
-                         fluidRow(
-                           column(
-                             width = 10, 
-                                  numericInput(
-                                    inputId = "weekProb1", 
-                                    label = "Probability of Rain One Week from Now", 
-                                    value = NA,
-                                    min = 0,
-                                    max = 1,
-                                    step = .01)),
-                           column(width = 2, br(), uiOutput("correctnessW2"))),
-                     fluidRow(
-                       column(
-                         width = 10, 
-                         numericInput(
-                           inputId = "monthProb1", 
-                           label = "Probability of Rain One Month from Now", 
-                           value = NA,
-                           min = 0,
-                           max = 1,
-                           step = .01)),
-                       column(width = 2, br(), uiOutput("correctnessW3"))),
-                     fluidRow(
-                       column(
-                         width = 10, 
-                         numericInput(
-                           inputId = "yearProb1", 
-                           label = "Probability of Rain One Year from Now", 
-                           value = NA,
-                           min = 0,
-                           max = 1,
-                           step = .01)),
-                       
-                       column(width = 2, br(), uiOutput("correctnessW4"))),
-                     
-                     bsButton("checkGame", "Check Answer"),
-                     bsButton("newWeather", "New Problem")),
               column(
-                width = 6,
-                checkboxInput(inputId = "showWeatherPlots", 
-                              label = "Show plots for weather sample paths"),
-                conditionalPanel( 
-                  condition = "input.showWeatherPlots",
-                  plotOutput("weatherDaily", height = '250px'), 
-                  htmlOutput("weatherDailyAlt"),
-                  plotOutput("weatherCumulativeProb", height = '300px'),
-                  htmlOutput("weatherCumulativeAlt"),
-                  bsButton(inputId  = "newWeatherPlotSamples", 
-                           label = "New Sample Path"))
+                width = 5,
+                  fluidRow(
+                    column(
+                      width = 10, 
+                      numericInput(
+                        inputId = "tomorrowProb1", 
+                         label = "Probability of Rain Tomorrow", 
+                         value = NA,
+                         min = 0,
+                         max = 1,
+                         step = .01)
+                    ),
+                    column(
+                      width = 2, 
+                      br(), 
+                      uiOutput("correctnessW1"))),
+                  fluidRow(
+                    column(
+                      width = 10, 
+                        numericInput(
+                          inputId = "weekProb1", 
+                          label = "Probability of Rain One Week from Now", 
+                          value = NA,
+                          min = 0,
+                          max = 1,
+                          step = .01)),
+                    column(width = 2,
+                           br(), 
+                           uiOutput("correctnessW2"))),
+                  fluidRow(
+                    column(
+                      width = 10, 
+                      numericInput(
+                        inputId = "monthProb1", 
+                        label = "Probability of Rain One Month from Now", 
+                        value = NA,
+                        min = 0,
+                        max = 1,
+                        step = .01)),
+                    column(width = 2, 
+                           br(), 
+                           uiOutput("correctnessW3"))),
+                  fluidRow(
+                    column(
+                      width = 10, 
+                      numericInput(
+                       inputId = "yearProb1", 
+                       label = "Probability of Rain One Year from Now", 
+                       value = NA,
+                       min = 0,
+                       max = 1,
+                       step = .01)),
+                    column(
+                      width = 2,
+                      br(), 
+                      uiOutput("correctnessW4"))),
+                  
+                    bsButton(
+                      inputId = "checkGame",
+                      label = "Check Answer"),
+                    bsButton(
+                      inputId = "newWeather", 
+                      label = "New Problem")),
+                  column(
+                    width = 6,
+                    checkboxInput(
+                      inputId = "showWeatherPlots", 
+                      label = "Show plots for weather sample paths"),
+                    conditionalPanel( 
+                      condition = "input.showWeatherPlots",
+                      plotOutput("weatherDaily", height = '250px'), 
+                      htmlOutput("weatherDailyAlt"),
+                      plotOutput("weatherCumulativeProb", height = '300px'),
+                      htmlOutput("weatherCumulativeAlt"),
+                      bsButton(
+                        inputId  = "newWeatherPlotSamples", 
+                        label = "New Sample Path"))
+                  )
+                )
               )
             )
-            ))),
-
+          ),
 
         #### Set up the References Page
         tabItem(
@@ -491,11 +572,16 @@ ui <- list(
             R Package. Springer-Verlag New York. Available from
             https://ggplot2.tidyverse.org"
           ),
+          br(),
+          br(),
+          br(),
+          boastUtils::copyrightInfo()
         )
       )
     )
   )
 )
+
 
 # Define server logic
 
