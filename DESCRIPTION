@@ -5,11 +5,9 @@ Lifecycle: experimental
 Authors@R: c(
     person(given = "Leah", family = "Hunt", email = "lmh5964@psu.edu", role = c("aut", "cre")), 
     person(given = "Shravani", family = "Samala", email = "sjs7049@psu.edu", role = c("ctb"))
-    
   )
 Chapter: Stochastic Processes
-Description: c(
-    "This app explores discrete time Markov Chains and their long run behavior by considering multiple sample problems.")
+Description: This app explores discrete time Markov Chains and their long run behavior by considering multiple sample problems.
 LearningObjectives: c()
 DisplayMode: Normal
 URL: https://psu-eberly.shinyapps.io/Markov_Chain_Convergence
