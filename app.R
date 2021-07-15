@@ -96,9 +96,9 @@ ui <- list(
             style = "text-align: center",
             bsButton(
               inputId = "go1",
-              label = "GO!",
+              label = "Explore!",
               size = "large",
-              icon = icon("bolt")
+              icon = icon("wpexplorer")
             )
           ),
           br(), 
