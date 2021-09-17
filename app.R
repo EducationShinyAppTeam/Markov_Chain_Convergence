@@ -9,6 +9,8 @@ library(shinyjs)
 library(ggplot2)
 library(tidyr)
 library(matrixcalc)
+library(DT)
+
 
 # App Meta Data----------------------------------------------------------------
 APP_TITLE  <<- "Convergence of Discrete-Time Markov Chains"
@@ -61,6 +63,7 @@ ui <- list(
       sidebarMenu(
         id = "pages",
         menuItem("Overview", tabName = "Overview", icon = icon("dashboard")),
+        menuItem("Prerequisites", tabName = "Prerequisites", icon = icon("book")),
         menuItem("Explore", tabName = "Explore", icon = icon("wpexplorer")),
         menuItem("References", tabName = "References", icon = icon("leanpub"))
       ),
@@ -91,14 +94,15 @@ ui <- list(
             tags$li('Click the "Show plots for sample paths" checkbox to see a 
                     sample path that the chain could take for the problem.')
           ),
+          br(), 
           ##### Go Button
           div(
             style = "text-align: center",
             bsButton(
               inputId = "go1",
-              label = "Explore!",
+              label = "Prerequisites!",
               size = "large",
-              icon = icon("wpexplorer")
+              icon = icon("book")
             )
           ),
           br(), 
@@ -112,7 +116,308 @@ ui <- list(
             div(class = "updated", 
                 "Last Update: 7/13/2020 by SJS.")
         ), 
+        
+        tabItem(
+          tabName = "Prerequisites",
+          withMathJax(),
+          h2("Prerequisites"), 
+          p("Review the definition of Markov Covergence and how to use the different
+            Markov Matrices to solve problems."), 
+          br(), 
+          box(
+            width = 12, 
+            collapsible = TRUE,
+            collapsed = FALSE,
+            title = h3("Markov Covergence"), 
+            p("Definition: A random process is Markov if the probability of being in each 
+            state might depend on the previous step, but no further information
+            would be provided by looking at where things stood at earlier steps"), 
+            p("For \\(i = 1,…,k\\) a finite state discrete time Markov chain would 
+            then have the property that \\(P\\{X_{n} = \\text{state i}\\} | X_{0}, X_{1},...,
+            X_{n-2},X_{n-1} = P\\{X_{n} = \\text{state i} |X_{n-1}\\}\\)."), 
+            p("If this probability structure stays the same from step-to-step then
+            the Markov chain is time homogeneous and its behavior will be independent
+            of n and depend only on the probabilities \\(P_{i,j} = P\\{X_{n} = \\text{state j}
+            |X_{n-1} = \\text{state i}\\}\\) and can be displayed in a \\(k\\times{k}\\) matrix
+            \\(P = P_{i,j}\\) called the", strong("Transition Matrix"), "of the Markov chain.")
+          ), 
+          box(
+            width = 12, 
+            collapsible = TRUE,
+            collapsed = FALSE,
+            title = h3("Example Problem"), 
+            p("Random varibale \\(x_{n}\\) tells you what the person ate
+            on the \\(n^{th}\\) day and \\(x_{n}\\) can be one of k = four states
+            (eggs, cereal, waffles, or pancakes) for \\(n = 1, 2, 3, ...\\)"), 
+            p("Probability for the various choices of what to eat for breakfast
+            might be affected by what they had yesterday (e.g., a person may be
+            reluctant to eat eggs two days in a row), but after taking yesterday’s
+            meal into account, the person’s decision would not be affected by what
+            they ate two or three days before."), 
+            br(),
+            
+            fluidRow(
+              column(
+                offset = 1, 
+                width = 1, 
+                br(), 
+                br(), 
+                br(), 
+                br(), 
+                
+                p("\\(P=\\)"), 
+              ), 
+              column(
+                width = 10, 
+                tags$table(
+                  rules = "all",
+                  border = "1pt",
+                  align = "left",
+                  width = "500px",
+                  targets = "_all",
+                  tags$caption("Transition Matrix for Breakfast"),
+                  tags$thead(
+                    tags$tr(
+                      tags$th("Breakfast"),
+                      tags$th("Eggs", style = "text-align: center;"),
+                      tags$th("Cereal", style = "text-align: center;"), 
+                      tags$th("Waffles", style = "text-align: center;"), 
+                      tags$th("Pancakes", style = "text-align: center;"),
+                    )
+                  ),
+                  tags$tbody(
+                    tags$tr(
+                      tags$th("Eggs", scope = "row"),
+                      tags$td("0.05"),
+                      tags$td("0.45"), 
+                      tags$td("0.25"),
+                      tags$td("0.25"), 
+                      align = "center"
+                    ),
+                    tags$tr(
+                      tags$th("Cereal", scope = "row"),
+                      tags$td("0.45"),
+                      tags$td("0.05"), 
+                      tags$td("0.25"),
+                      tags$td("0.25"), 
+                      align = "center"
+                    ), 
+                    tags$tr(
+                      tags$th("Waffles", scope = "row"),
+                      tags$td("0.40"),
+                      tags$td("0.40"), 
+                      tags$td("0.05"),
+                      tags$td("0.15"), 
+                      align = "center"
+                    ),
+                    tags$tr(
+                      tags$th("Pancakes", scope = "row"),
+                      tags$td("0.40"),
+                      tags$td("0.40"), 
+                      tags$td("0.15"),
+                      tags$td("0.05"), 
+                      align = "center", 
+                      width = "200%"
+                    )
+                  )
+                ) 
+              )
+            ), 
+            br(), 
+            p("The columns signify Breakfast foods eaten today and the row headers
+            signify the Breakfast foods eaten yesterday.", align = "center"),
+            br(), 
+            tags$ul(
+              tags$li("Probability that person eats eggs today if they had waffles 
+                      yesterday is 0.40"
+              ), 
+              tags$li("Probability that person eats eggs on Wednesday given that
+              they had eggs two days prior on Monday is: \\(0.05(0.05) + 0.45(0.45)
+              + 0.25(0.4) + 0.25(0.40) = 0.405\\)"
+              ),
+              tags$ul(
+                tags$li("Sum over the probabilities for what the person eats on
+                        Tuesday times the probability they go to eggs from that on
+                        Wednesday")
+              )
+            ),
+            br(), 
+            p("The two step transition probabilities is given by: "),
+            fluidRow(
+              column(
+                offset = 1, 
+                width = 1, 
+                br(), 
+                br(), 
+                br(), 
+                br(), 
+                
+                p("\\(P^2=\\)"), 
+              ), 
+              column(
+                width = 10, 
+                tags$table(
+                  rules = "all",
+                  border = "1pt",
+                  align = "left",
+                  width = "500px",
+                  targets = "_all",
+                  tags$caption("Transition Matrix for Breakfast"),
+                  tags$thead(
+                    tags$tr(
+                      tags$th("Breakfast"),
+                      tags$th("Eggs", style = "text-align: center;"),
+                      tags$th("Cereal", style = "text-align: center;"), 
+                      tags$th("Waffles", style = "text-align: center;"), 
+                      tags$th("Pancakes", style = "text-align: center;"),
+                    )
+                  ),
+                  tags$tbody(
+                    tags$tr(
+                      tags$th("Eggs", scope = "row"),
+                      tags$td("0.405"),
+                      tags$td("0.245"), 
+                      tags$td("0.175"),
+                      tags$td("0.175"), 
+                      align = "center"
+                    ),
+                    tags$tr(
+                      tags$th("Cereal", scope = "row"),
+                      tags$td("0.245"),
+                      tags$td("0.405"), 
+                      tags$td("0.175"),
+                      tags$td("0.175"), 
+                      align = "center"
+                    ), 
+                    tags$tr(
+                      tags$th("Waffles", scope = "row"),
+                      tags$td("0.280"),
+                      tags$td("0.280"), 
+                      tags$td("0.225"),
+                      tags$td("0.215"), 
+                      align = "center"
+                    ),
+                    tags$tr(
+                      tags$th("Pancakes", scope = "row"),
+                      tags$td("0.280"),
+                      tags$td("0.280"), 
+                      tags$td("0.215"),
+                      tags$td("0.225"), 
+                      align = "center", 
+                      width = "200%"
+                    )
+                  )
+                ) 
+              )
+            ), 
+            br(), 
+            p("Similarly, we see that the (i,j)th element of Pn (the nth power of
+              the transition matrix P) gives the probability of moving from state
+              i to state j in n steps."), 
+            fluidRow(
+              column(
+                offset = 1, 
+                width = 1, 
+                br(), 
+                br(), 
+                br(), 
+                br(), 
+                
+                p("\\(P^{365}=\\)"), 
+              ), 
+              column(
+                width = 10, 
+                tags$table(
+                  rules = "all",
+                  border = "1pt",
+                  align = "left",
+                  width = "500px",
+                  targets = "_all",
+                  tags$caption("Transition Matrix for Breakfast"),
+                  tags$thead(
+                    tags$tr(
+                      tags$th("Breakfast"),
+                      tags$th("Eggs", style = "text-align: center;"),
+                      tags$th("Cereal", style = "text-align: center;"), 
+                      tags$th("Waffles", style = "text-align: center;"), 
+                      tags$th("Pancakes", style = "text-align: center;"),
+                    )
+                  ),
+                  tags$tbody(
+                    tags$tr(
+                      tags$th("Eggs", scope = "row"),
+                      tags$td("0.308"),
+                      tags$td("0.308"), 
+                      tags$td("0.192"),
+                      tags$td("0.192"), 
+                      align = "center"
+                    ),
+                    tags$tr(
+                      tags$th("Cereal", scope = "row"),
+                      tags$td("0.308"),
+                      tags$td("0.308"), 
+                      tags$td("0.192"),
+                      tags$td("0.192"), 
+                      align = "center"
+                    ), 
+                    tags$tr(
+                      tags$th("Waffles", scope = "row"),
+                      tags$td("0.308"),
+                      tags$td("0.308"), 
+                      tags$td("0.192"),
+                      tags$td("0.192"),  
+                      align = "center"
+                    ),
+                    tags$tr(
+                      tags$th("Pancakes", scope = "row"),
+                      tags$td("0.308"),
+                      tags$td("0.308"), 
+                      tags$td("0.192"),
+                      tags$td("0.192"), 
+                      align = "center", 
+                      width = "200%"
+                    )
+                  )
+                ) 
+              )
+            ), 
+            br(), 
+            p("After so many days, the distribution no longer depends on what you
+              ate so long ago "),
 
+          ), 
+          box(
+            width = 12, 
+            title = h3("Definitions"),
+            tags$ul(
+              tags$li(
+                "Limiting Distribution: As the number of steps goes to infinity,
+                the chance of being in a state i converges to a value, \\(π_i\\)," 
+              ), 
+              tags$li(
+                "Irreducible: when a Markov Chain has a nozero probability of
+                getting from any state to any other state in a finite number of moves" 
+              ), 
+              tags$li(
+                "Aperiodic: when a Markov Chain has a nonzero probability of
+                getting from some state back to itself in n state eps and in m
+                steps where the greatest common divisor of n and m is 1" 
+              )
+            )
+          ), 
+        
+          br(), 
+          ##### Go Button
+          div(
+            style = "text-align: center",
+            bsButton(
+              inputId = "go2",
+              label = "Explore!",
+              size = "large",
+              icon = icon("book")
+            )
+          ),
+        ), 
         #### Set up an Explore Page
         tabItem(
           tabName = "Explore",
@@ -602,6 +907,16 @@ server <- function(input, output, session) {
   # Go button on Overview page
   observeEvent(
     eventExpr = input$go1, 
+    handlerExpr = { 
+      updateTabItems(
+        session = session, 
+        inputId = "pages", 
+        selected = "Prerequisites" 
+      ) 
+    })
+  
+  observeEvent(
+    eventExpr = input$go2, 
     handlerExpr = { 
       updateTabItems(
         session = session, 
@@ -1384,8 +1699,7 @@ server <- function(input, output, session) {
       )))
   })
 }
-
-
+  
 
 # Create Shiny App using BOAST App template
 boastUtils::boastApp(ui = ui, server = server)
