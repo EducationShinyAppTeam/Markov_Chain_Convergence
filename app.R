@@ -128,7 +128,7 @@ ui <- list(
             width = 12, 
             collapsible = TRUE,
             collapsed = FALSE,
-            title = h3("Markov Covergence"), 
+            title = h3("Markov Chain Covergence"), 
             p("Definition: A random process is Markov if the probability of being in each 
             state might depend on the previous step, but no further information
             would be provided by looking at where things stood at earlier steps"), 
@@ -173,7 +173,7 @@ ui <- list(
                   rules = "all",
                   border = "1pt",
                   align = "left",
-                  width = "500px",
+                  #width = "500px",
                   targets = "_all",
                   tags$caption("Transition Matrix for Breakfast"),
                   tags$thead(
@@ -260,7 +260,7 @@ ui <- list(
                   rules = "all",
                   border = "1pt",
                   align = "left",
-                  width = "500px",
+                  #width = "500px",
                   targets = "_all",
                   tags$caption("Transition Matrix for Breakfast"),
                   tags$thead(
@@ -331,7 +331,7 @@ ui <- list(
                   rules = "all",
                   border = "1pt",
                   align = "left",
-                  width = "500px",
+                  #width = "500px",
                   targets = "_all",
                   tags$caption("Transition Matrix for Breakfast"),
                   tags$thead(
@@ -389,6 +389,8 @@ ui <- list(
           box(
             width = 12, 
             title = h3("Definitions"),
+            collapsible = TRUE,
+            collapsed = FALSE,
             tags$ul(
               tags$li(
                 "Limiting Distribution: As the number of steps goes to infinity,
