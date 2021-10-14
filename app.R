@@ -108,8 +108,8 @@ ui <- list(
           br(), 
           br(), 
           h2("Acknowledgements"), 
-          p("This app was developed and coded by Leah Hunt and updated in 2021
-             by Shravani Samala"),
+          p("This app was developed and coded by Leah Hunt in 2020 and updated
+            in 2021 by Shravani Samala"),
             br(), 
             br(), 
             br(), 
@@ -121,39 +121,42 @@ ui <- list(
           tabName = "Prerequisites",
           withMathJax(),
           h2("Prerequisites"), 
-          p("Review the definition of Markov Covergence and how to use the different
-            Markov Matrices to solve problems."), 
+          p("Review information about the convergence of discrete time Markov
+            Chains and how to use the transition matrix to solve problems."), 
           br(), 
           box(
             width = 12, 
             collapsible = TRUE,
             collapsed = FALSE,
             title = h3("Markov Chain Covergence"), 
-            p("Definition: A random process is Markov if the probability of being in each 
-            state might depend on the previous step, but no further information
-            would be provided by looking at where things stood at earlier steps"), 
-            p("For \\(i = 1,…,k\\) a finite state discrete time Markov chain would 
-            then have the property that \\(P\\{X_{n} = \\text{state i}\\} | X_{0}, X_{1},...,
-            X_{n-2},X_{n-1} = P\\{X_{n} = \\text{state i} |X_{n-1}\\}\\)."), 
-            p("If this probability structure stays the same from step-to-step then
-            the Markov chain is time homogeneous and its behavior will be independent
-            of n and depend only on the probabilities \\(P_{i,j} = P\\{X_{n} = \\text{state j}
-            |X_{n-1} = \\text{state i}\\}\\) and can be displayed in a \\(k\\times{k}\\) matrix
-            \\(P = P_{i,j}\\) called the", strong("Transition Matrix"), "of the Markov chain.")
+            p("Definition: A random process is Markov if the probability of
+              being in each state might depend on the previous step, but no
+              further information would be provided by looking at where things
+              stood at earlier steps."), 
+            p("For \\(i = 1,…,k\\) a finite state discrete time Markov chain
+              would then have the property that 
+              \\(P\\{X_{n} = \\text{state i}\\} | X_{0}, X_{1},...,
+              X_{n-2},X_{n-1} = P\\{X_{n} = \\text{state i} |X_{n-1}\\}\\)."), 
+            p("If this probability structure stays the same from step-to-step
+              then the Markov chain is time homogeneous and its behavior will be
+              independent of n and depend only on the probabilities \\(P_{i,j}
+              = P\\{X_{n} = \\text{state j}|X_{n-1} = \\text{state i}\\}\\) and
+              can be displayed in a \\(k\\times{k}\\) matrix \\(P = P_{i,j}\\)
+              is called the", strong("Transition Matrix"),"of the Markov chain.")
           ), 
           box(
             width = 12, 
             collapsible = TRUE,
             collapsed = FALSE,
             title = h3("Example Problem"), 
-            p("Random varibale \\(x_{n}\\) tells you what the person ate
-            on the \\(n^{th}\\) day and \\(x_{n}\\) can be one of k = four states
-            (eggs, cereal, waffles, or pancakes) for \\(n = 1, 2, 3, ...\\)"), 
+            p("Random varibale \\(x_{n}\\) tells you what the person ate on the
+              \\(n^{th}\\) day and \\(x_{n}\\) can be one of \\(k=\\) four states
+              (eggs, cereal, waffles, or pancakes) for \\(n = 1, 2, 3, ...\\)"), 
             p("Probability for the various choices of what to eat for breakfast
-            might be affected by what they had yesterday (e.g., a person may be
-            reluctant to eat eggs two days in a row), but after taking yesterday’s
-            meal into account, the person’s decision would not be affected by what
-            they ate two or three days before."), 
+              might be affected by what they had yesterday (e.g., a person may
+              be reluctant to eat eggs two days in a row), but after taking 
+              yesterday’s meal into account, the person’s decision would not be
+              affected by what they ate two or three days before."), 
             br(),
             
             fluidRow(
@@ -229,16 +232,16 @@ ui <- list(
             br(), 
             tags$ul(
               tags$li("Probability that person eats eggs today if they had waffles 
-                      yesterday is 0.40"
+                      yesterday is 0.40."
               ), 
               tags$li("Probability that person eats eggs on Wednesday given that
               they had eggs two days prior on Monday is: \\(0.05(0.05) + 0.45(0.45)
-              + 0.25(0.4) + 0.25(0.40) = 0.405\\)"
+              + 0.25(0.4) + 0.25(0.40) = 0.405\\)."
               ),
               tags$ul(
                 tags$li("Sum over the probabilities for what the person eats on
                         Tuesday times the probability they go to eggs from that on
-                        Wednesday")
+                        Wednesday.")
               )
             ),
             br(), 
@@ -311,9 +314,9 @@ ui <- list(
               )
             ), 
             br(), 
-            p("Similarly, we see that the (i,j)th element of Pn (the nth power of
-              the transition matrix P) gives the probability of moving from state
-              i to state j in n steps."), 
+            p("Similarly, we see that the (i,j)th element of \\(P^n\\) (the
+              \\(n^{th}\\) power of the transition matrix \\(P\\) gives the
+              probability of moving from state i to state j in n steps."), 
             fluidRow(
               column(
                 offset = 1, 
@@ -431,10 +434,10 @@ ui <- list(
             "Below you are given a calculator to help you understand the long run
             behavior. To use the calculator, you should first choose a size for 
             your probability matrix then fill in the transition probabilities. 
-            Note that since this is a probability matrix, the rows must sum to 1. 
-            The Number of Steps allows you to choose how many steps in the future
-            to consider the matrix, i.e. the calculator will take your 
-            probability matrix to the nth power."
+            Note that since this is a transition probability matrix, the rows
+            must sum to 1. The Number of Steps allows you to choose how many
+            steps in the future to consider the matrix, i.e. the calculator will
+            take your probability matrix to the \\(n^{th}\\) power."
           ),
           p(
             "Use the calculator to answer the problems for each scenario. To 
