@@ -141,8 +141,9 @@ ui <- list(
               then the Markov chain is time homogeneous and its behavior will be
               independent of n and depend only on the probabilities \\(P_{i,j}
               = P\\{X_{n} = \\text{state j}|X_{n-1} = \\text{state i}\\}\\) and
-              can be displayed in a \\(k\\times{k}\\) matrix \\(P = P_{i,j}\\)
-              is called the", strong("Transition Matrix"),"of the Markov chain.")
+              can be displayed in a \\(k\\times{k}\\) matrix \\(P = \\{P_{i,j}\\}
+              \\) is called the", strong("Transition Matrix"),"of the Markov
+              chain.")
           ), 
           box(
             width = 12, 
