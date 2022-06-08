@@ -8,8 +8,8 @@ library(shinyMatrix)
 library(shinyjs)
 library(ggplot2)
 library(tidyr)
-#library(matrixcalc)
-#library(DT)
+library(matrixcalc)
+library(DT)
 
 # Function for showing the check or X based on a condition
 # Input: boolean for whether the condition is true or false
