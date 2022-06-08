@@ -1,4 +1,4 @@
-# Load Packages
+# Load Packages ----
 library(shiny)
 library(shinydashboard)
 library(shinyBS)
@@ -8,17 +8,8 @@ library(shinyMatrix)
 library(shinyjs)
 library(ggplot2)
 library(tidyr)
-library(matrixcalc)
-library(DT)
-
-
-# App Meta Data----------------------------------------------------------------
-APP_TITLE  <<- "Convergence of Discrete-Time Markov Chains"
-APP_DESCP  <<- paste(
-  "This app explores discrete time Markov Chains and their long run behavior",
-  "by considering multiple sample problems."
-)
-# End App Meta Data------------------------------------------------------------
+#library(matrixcalc)
+#library(DT)
 
 # Function for showing the check or X based on a condition
 # Input: boolean for whether the condition is true or false
@@ -32,17 +23,12 @@ correctnessPic <- function(condition){
   }
 }
 
-# Define UI for App
+# Define UI for App ----
 ui <- list(
   useShinyjs(),
-  # tags$head(
-  #   tags$link(rel = "stylesheet", type = "text/css",
-  # href = "https://educationshinyappteam.github.io/Style_Guide/theme/boast.css")
-  # ),
-  ## Create the app page
   dashboardPage(
     skin = "blue",
-    ### Create the app header
+    ## Header ----
     dashboardHeader(
       title = "MC Convergence", 
       titleWidth = 250,
@@ -58,11 +44,11 @@ ui <- list(
         )
       )
     ),
-    ### Create the sidebar/left navigation menu
+    ## Sidebar ----
     dashboardSidebar(
       sidebarMenu(
         id = "pages",
-        menuItem("Overview", tabName = "Overview", icon = icon("dashboard")),
+        menuItem("Overview", tabName = "Overview", icon = icon("tachometer-alt")),
         menuItem("Prerequisites", tabName = "Prerequisites", icon = icon("book")),
         menuItem("Explore", tabName = "Explore", icon = icon("wpexplorer")),
         menuItem("References", tabName = "References", icon = icon("leanpub"))
@@ -72,10 +58,10 @@ ui <- list(
         boastUtils::sidebarFooter()
       )
     ),
-    ### Create the content
+    ## Body ----
     dashboardBody(
       tabItems(
-        #### Set up the Overview Page
+        ### Overview Page ----
         tabItem(
           tabName = "Overview",
           withMathJax(),
@@ -95,9 +81,8 @@ ui <- list(
                     sample path that the chain could take for the problem.')
           ),
           br(), 
-          ##### Go Button
           div(
-            style = "text-align: center",
+            style = "text-align: center;",
             bsButton(
               inputId = "go1",
               label = "Prerequisites!",
@@ -109,14 +94,18 @@ ui <- list(
           br(), 
           h2("Acknowledgements"), 
           p("This app was developed and coded by Leah Hunt in 2020 and updated
-            in 2021 by Shravani Samala"),
-            br(), 
-            br(), 
-            br(), 
-            div(class = "updated", 
-                "Last Update: 7/13/2020 by SJS.")
+            in 2021 by Shravani Samala",
+            br(),
+            br(),
+            "Cite this app as:",
+            br(),
+            citeApp(),
+            br(),
+            br(),
+            div(class = "updated",  "Last Update: 6/7/2022 by NJH.")
+          )
         ), 
-        
+        ### Prerequisites Page ----
         tabItem(
           tabName = "Prerequisites",
           withMathJax(),
@@ -128,15 +117,15 @@ ui <- list(
             width = 12, 
             collapsible = TRUE,
             collapsed = FALSE,
-            title = h3("Markov Chain Covergence"), 
+            title = strong("Markov Chain Covergence"), 
             p("Definition: A random process is Markov if the probability of
-              being in each state might depend on the previous step, but no
-              further information would be provided by looking at where things
-              stood at earlier steps."), 
-            p("For \\(i = 1,…,k\\) a finite state discrete time Markov chain
+              being in each of \\(k\\) possible states might depend on the
+              previous step, but no further information would be provided by
+              looking at where things stood at earlier steps."), 
+            p("For \\(i = 1,\\ldots,k\\) a finite state discrete time Markov chain
               would then have the property that 
-              \\(P\\{X_{n} = \\text{state i}\\} | X_{0}, X_{1},...,
-              X_{n-2},X_{n-1} = P\\{X_{n} = \\text{state i} |X_{n-1}\\}\\)."), 
+              \\(P\\{X_{n} = \\text{state i}\\} | X_{0}, X_{1},\\ldots,
+              X_{n-2},X_{n-1}\\} = P\\{X_{n} = \\text{state i} | X_{n-1}\\}\\)."), 
             p("If this probability structure stays the same from step-to-step
               then the Markov chain is time homogeneous and its behavior will be
               independent of n and depend only on the probabilities \\(P_{i,j}
@@ -148,10 +137,10 @@ ui <- list(
           box(
             width = 12, 
             collapsible = TRUE,
-            collapsed = FALSE,
-            title = h3("Example Problem"), 
-            p("Random varibale \\(x_{n}\\) tells you what the person ate on the
-              \\(n^{th}\\) day and \\(x_{n}\\) can be one of \\(k=\\) four states
+            collapsed = TRUE,
+            title = strong("Example Problem"), 
+            p("Random variable \\(X_{n}\\) tells you what the person ate on the
+              \\(n^{th}\\) day and \\(X_{n}\\) can be one of \\(k=\\) four states
               (eggs, cereal, waffles, or pancakes) for \\(n = 1, 2, 3, ...\\)"), 
             p("Probability for the various choices of what to eat for breakfast
               might be affected by what they had yesterday (e.g., a person may
@@ -241,8 +230,8 @@ ui <- list(
               ),
               tags$ul(
                 tags$li("Sum over the probabilities for what the person eats on
-                        Tuesday times the probability they go to eggs from that on
-                        Wednesday.")
+                        Tuesday times the probability they go to eggs from that
+                        on Wednesday.")
               )
             ),
             br(), 
@@ -388,43 +377,44 @@ ui <- list(
             br(), 
             p("After so many days, the distribution no longer depends on what you
               ate so long ago "),
-
+            
           ), 
           box(
             width = 12, 
-            title = h3("Definitions"),
+            title = strong("Definitions"),
             collapsible = TRUE,
-            collapsed = FALSE,
+            collapsed = TRUE,
             tags$ul(
               tags$li(
-                "Limiting Distribution: As the number of steps goes to infinity,
-                the chance of being in a state i converges to a value, \\(π_i\\)," 
+                strong("Limiting Distribution:"), "as the number of steps goes
+                to infinity, the chance of being in a state i converges to a
+                value, \\(π_i\\)." 
               ), 
               tags$li(
-                "Irreducible: when a Markov Chain has a nozero probability of
-                getting from any state to any other state in a finite number of moves" 
+                strong("Irreducible:"), "when a Markov Chain has a nozero
+                probability of getting from any state to any other state in a
+                finite number of moves." 
               ), 
               tags$li(
-                "Aperiodic: when a Markov Chain has a nonzero probability of
-                getting from some state back to itself in n state eps and in m
-                steps where the greatest common divisor of n and m is 1" 
+                strong("Aperiodic:"), "when a Markov Chain has a nonzero
+                probability of getting from some state back to itself in n state
+                steps and in m steps where the greatest common divisor of n and
+                m is 1." 
               )
             )
           ), 
-        
           br(), 
-          ##### Go Button
           div(
-            style = "text-align: center",
+            style = "text-align: center;",
             bsButton(
               inputId = "go2",
               label = "Explore!",
               size = "large",
-              icon = icon("book")
+              icon = icon("bolt")
             )
           ),
         ), 
-        #### Set up an Explore Page
+        ### Explore Page ----
         tabItem(
           tabName = "Explore",
           withMathJax(),
@@ -436,211 +426,201 @@ ui <- list(
             behavior. To use the calculator, you should first choose a size for 
             your probability matrix then fill in the transition probabilities. 
             Note that since this is a transition probability matrix, the rows
-            must sum to 1. The Number of Steps allows you to choose how many
-            steps in the future to consider the matrix, i.e. the calculator will
-            take your probability matrix to the \\(n^{th}\\) power."
+            must sum to 1. The Number of steps (\\(n\\)) allows you to choose how
+            many steps in the future to consider the matrix, i.e. the calculator
+            will take your probability matrix to the \\(n^{th}\\) power."
           ),
           p(
             "Use the calculator to answer the problems for each scenario. To 
-            generate new numbers for the problem, click the new problem button.
+            generate new numbers for the problem, click the 'New problem' button.
             Notice the rate at which the chain approaches long run behavior in  
             each problem."
           ),
-          br(), 
+          br(),
+          #### Calculator set up ----
           fluidRow(
             column(
-              width = 12, 
-              titlePanel("Transition Probability Calculator"),
-              sidebarLayout(
-                sidebarPanel(
-                  # Input for number of rows in the matrix
-                  selectInput(
-                    inputId = "nrows", 
-                    label = "Number of States in the Matrix:", 
-                    choices = c(2,3,4,5), 
-                    selected = 2),
-                  
-                  # Input to select current state of the matrix conditional on the 
-                  # matrix size
-                  conditionalPanel(
-                    condition = "input.nrows == 2", 
-                    matrixInput(
-                      inputId = "ogMat2", 
-                      value  = matrix(diag(2), nrow = 2, dimnames = list(0:1, 0:1)), 
-                      rows = list(names = TRUE), 
-                      cols = list( names = TRUE), 
-                      class = "numeric")
-                    ),
-                  conditionalPanel(
-                    condition = "input.nrows == 3",
-                    matrixInput(
-                      inputId = "ogMat3", 
-                      value = matrix(diag(3), nrow = 3, dimnames = list(0:2, 0:2)), 
-                      rows = list(names = TRUE), 
-                      cols = list( names = TRUE), 
-                      class = "numeric")
-                  ),
-                  conditionalPanel(
-                    condition = "input.nrows == 4",
-                    matrixInput(
-                      inputId = "ogMat4", 
-                      value = matrix(diag(4), nrow = 4, dimnames = list(0:3, 0:3)), 
-                      rows = list(names = TRUE),
-                      cols = list( names = TRUE), 
-                      class = "numeric" )
-                  ),
-                  conditionalPanel(
-                    condition = "input.nrows == 5",
-                    matrixInput(
-                      inputId = "ogMat5", 
-                      value = matrix(diag(5), nrow = 5, dimnames = list(0:4, 0:4)), 
-                      rows = list(names = TRUE), 
-                      cols = list( names = TRUE), 
-                      class = "numeric" )
-                  ),
-                  conditionalPanel(
-                    condition = "input.nrows > 5 | input.nrows < 2",
-                    "This number of rows is not supported."
-                  ),
-                  
-                  # Input for number of steps to take
-                  numericInput(
-                    inputId = "steps", 
-                     label = "Number of steps", 
-                     min = 1, 
-                     max = 10000, 
-                     value = 1, 
-                     step = 1),
-                  bsButton(
-                    inputId = "subMat", 
-                    label = "Calculate Matrix")
+              width = 4,
+              wellPanel(
+                # Input for number of rows in the matrix
+                selectInput(
+                  inputId = "nStates", 
+                  label = "Number of states in the matrix", 
+                  choices = c(2,3,4,5), 
+                  selected = 2
                 ),
-                
-                # Outputs: plot of states visited and the matrix to the n-steps power
-                mainPanel(
-                  conditionalPanel(
-                    condition = "!input.subMat",
-                    p("To see the matrix x steps out, click the Calculate Matrix 
-                      button.")
-                  ),
-                  textOutput("matlabel"),
-                  tableOutput("mat")
-                )
+                matrixInput(
+                  inputId = "userMatrix",
+                  label = "Enter the probabilities",
+                  value = matrix(diag(2), nrow = 2, dimnames = list(0:1, 0:1)),
+                  rows = list(names = TRUE, editableNames = TRUE),
+                  cols = list(names = TRUE, editableNames = TRUE),
+                  class = "numeric"
+                ),
+                # Input for number of steps to take
+                numericInput(
+                  inputId = "steps", 
+                  label = "Number of steps to take", 
+                  min = 1, 
+                  max = 10000, 
+                  value = 1, 
+                  step = 1
+                ),
+                bsButton(
+                  inputId = "subMat", 
+                  label = "Calculate matrix",
+                  size = "large",
+                  icon = icon("calculator"))
               )
+            ),
+            column(
+              width = 8,
+              offset = 0,
+              DT::DTOutput(outputId = "calcMatrix", width = "50%"),
             )
           ),
-          br(), 
+          br(),
+          #### Tabs of Situations ----
+          ## Note the problem text contain randomly generated values.
           tabsetPanel(
             id = "problems",
+            type = "tabs",
             tabPanel(
               title = "Candy",
-                h2("Candy or Cookies"),
-                textOutput("candyProb"),
-                br(),
-                fluidRow(
-                  column(
-                    width = 5,
-                    fluidRow(
-                      column(width = 10, 
-                        numericInput(
-                          inputId = "child1Prob", 
-                          label = "Probability that the next child chooses candy", 
-                          value = NA,
-                          min = 0,
-                          max = 1,
-                          step = .01)
-                        ),
-                        column(width = 2, 
-                               br(), 
-                               uiOutput("correctnessChild1"))),
-                    fluidRow(
-                      column(
-                        width = 10, 
-                        numericInput(
-                          inputId = "child5Prob", 
-                          label = "Probability that the fifth child chooses candy", 
-                          value = NA,
-                          min = 0,
-                          max = 1,
-                          step = .01)
-                      ),
-                      column(width = 2, 
-                             br(), 
-                             uiOutput("correctnessChild5"))),
-                    fluidRow(
-                      column(
-                        width = 10, 
-                          numericInput(
-                            inputId = "child10Prob", 
-                             label = "Probability that the tenth child chooses 
-                                      candy", 
-                             value = NA,
-                             min = 0,
-                             max = 1,
-                             step = .01)),
-                      column(
-                        width = 2, 
-                        br(), 
-                        uiOutput("correctnessChild10"))),
-                    fluidRow(
-                      column(
-                        width = 10, 
-                        numericInput(
-                          inputId = "child20Prob", 
-                          label = "Probability that the last child chooses candy", 
-                          value = NA,
-                          min = 0,
-                          max = 1,
-                          step = .01)),
-                      column(
-                        width = 2,
-                        br(), 
-                        uiOutput("correctnessChild20"))),
-                    
-                actionButton(
-                  inputId = "checkCandy", 
-                  label = "Check Answer"),
-                actionButton(
-                  inputId = "newCandy", 
-                  label = "New Problem")),
+              br(),
+              ##### Candy ----
+              h3("Candy or Cookies"),
+              textOutput("candyProb"), 
+              br(),
+              fluidRow(
                 column(
-                  width = 7,
-                    checkboxInput(
-                      inputId = "showCandyPlots", 
-                      label = "Show plots for candy sample paths"),
-                    conditionalPanel( 
-                     condition = "input.showCandyPlots",
-                     plotOutput("candyDaily", height = '250px'), 
-                     htmlOutput("candyDailyAlt"),
-                     plotOutput("candyCumulativeProb", height = '300px'),
-                     htmlOutput("candyCumulativeAlt"),
-                     actionButton(
-                       inputId = "newCandyPlotSamples", 
-                       label = "New Sample Path"))
+                  width = 5,
+                  offset = 0,
+                  fluidRow(
+                    ##### Improve here----
+                    ## rethink layout of question/answer mark
+                    column(
+                      width = 9, 
+                      numericInput(
+                        inputId = "child1Prob", 
+                        label = "Probability that the next child chooses candy", 
+                        value = NA,
+                        min = 0,
+                        max = 1,
+                        step = .01
+                      )
+                    ),
+                    column(
+                      width = 3, 
+                      br(), 
+                      uiOutput("correctnessChild1")
                     )
+                  ),
+                  fluidRow(
+                    column(
+                      width = 9, 
+                      numericInput(
+                        inputId = "child5Prob", 
+                        label = "Probability that the fifth child chooses candy", 
+                        value = NA,
+                        min = 0,
+                        max = 1,
+                        step = .01
+                      )
+                    ),
+                    column(
+                      width = 3, 
+                      br(), 
+                      uiOutput("correctnessChild5")
+                    )
+                  ),
+                  fluidRow(
+                    column(
+                      width = 10, 
+                      numericInput(
+                        inputId = "child10Prob", 
+                        label = "Probability that the tenth child chooses candy", 
+                        value = NA,
+                        min = 0,
+                        max = 1,
+                        step = .01)),
+                    column(
+                      width = 2, 
+                      br(), 
+                      uiOutput("correctnessChild10"))),
+                  fluidRow(
+                    column(
+                      width = 10, 
+                      numericInput(
+                        inputId = "child20Prob", 
+                        label = "Probability that the last child chooses candy", 
+                        value = NA,
+                        min = 0,
+                        max = 1,
+                        step = .01)),
+                    column(
+                      width = 2,
+                      br(), 
+                      uiOutput("correctnessChild20"))),
+                  
+                  bsButton(
+                    inputId = "checkCandy", 
+                    label = "Check answer",
+                    size = "large"
+                  ),
+                  bsButton(
+                    inputId = "newCandy", 
+                    label = "New problem",
+                    size = "large",
+                    icon = icon("retweet")
                   )
                 ),
-          tabPanel(
-            title = "Traffic Lights",
-            h2("Traffic Lights"),
-            textOutput("lightProb"),
-            br(),
-            fluidRow(
-              column(
-                width = 4,
-                numericInput(
-                  inputId = "TLG1", 
-                  label = "Probability of Next Light Green", 
-                  value = NA,
-                  min = 0,
-                  max = 1,
-                  step = .01)),
-              column(
-                width = 1, 
-                br(), 
-                uiOutput("correctnessLG1")),
-              column(
-                width = 4,
+                column(
+                  width = 7,
+                  checkboxInput(
+                    inputId = "showCandyPlots", 
+                    label = "Show plots for candy sample paths"
+                  ),
+                  conditionalPanel( 
+                    condition = "input.showCandyPlots",
+                    plotOutput("candyDaily", height = '250px'),
+                    ##### Improvement here ----
+                    ## Update the alt text to new approaches
+                    htmlOutput("candyDailyAlt"),
+                    plotOutput("candyCumulativeProb", height = '300px'),
+                    htmlOutput("candyCumulativeAlt"),
+                    bsButton(
+                      inputId = "newCandyPlotSamples", 
+                      label = "New Sample Path",
+                      size = "large"
+                    )
+                  )
+                )
+              )
+            ),
+            ##### Traffic ----
+            tabPanel(
+              title = "Traffic Lights",
+              br(),
+              h2("Traffic Lights"),
+              textOutput("lightProb"),
+              br(),
+              fluidRow(
+                column(
+                  width = 4,
+                  numericInput(
+                    inputId = "TLG1", 
+                    label = "Probability of Next Light Green", 
+                    value = NA,
+                    min = 0,
+                    max = 1,
+                    step = .01)),
+                column(
+                  width = 1, 
+                  br(), 
+                  uiOutput("correctnessLG1")),
+                column(
+                  width = 4,
                 numericInput(
                   inputId = "TLR1", 
                   label = "Probability of Next Light Red", 
@@ -729,9 +709,10 @@ ui <- list(
                 inputId = "newLightPlotSamples", 
                 label = "New Sample Path"))
           ),
-          
+          ##### Weather ----
           tabPanel(
             title = "Weather",
+            br(),
             h2("Rain or No Rain"),
             textOutput("weatherProb"),
             p("Today, it rained. Calculate the probability that it will rain 
@@ -820,8 +801,7 @@ ui <- list(
               )
             )
           ),
-
-        #### Set up the References Page
+        ### References Page ----
         tabItem(
           tabName = "References",
           withMathJax(),
@@ -894,23 +874,27 @@ ui <- list(
 )
 
 
-# Define server logic
-
+# Define server logic ----
 server <- function(input, output, session) {
-  # Code for instructions (i) button
-  observeEvent(input$info,{
-    sendSweetAlert(
-      session = session,
-      title = "Instructions:",
-      text = "In this app, you will explore the long run behavior of discrete
-      time Markov Chains using several example problems for illustration. Solve
-      each problem to see how quickly the chain approaches long run behavior
-      in the examples.",
-      type = "info"
-    )
-  })
+  calculatedMatrix <- reactiveVal(NULL)
   
-  # Go button on Overview page
+  ## info button ----
+  observeEvent(
+    eventExpr = input$info,
+    handlerExpr = {
+      sendSweetAlert(
+        session = session,
+        title = "Instructions",
+        text = "In this app, you will explore the long run behavior of discrete
+        time Markov Chains using several example problems for illustration. Solve
+        each problem to see how quickly the chain approaches long run behavior
+        in the examples.",
+        type = "info"
+      )
+    }
+  )
+  
+  ## Overview page's go button ----
   observeEvent(
     eventExpr = input$go1, 
     handlerExpr = { 
@@ -921,6 +905,7 @@ server <- function(input, output, session) {
       ) 
     })
   
+  ## Prereq page's go button ----
   observeEvent(
     eventExpr = input$go2, 
     handlerExpr = { 
@@ -931,100 +916,129 @@ server <- function(input, output, session) {
       ) 
     })
   
-  # Handles verification that the entered matrix is a probability matrix for 2x2 
-  ogMat2 <- reactive({
-   validate(
-      need(min(input$ogMat2) >= 0 && sum(input$ogMat2[1,]) == 1 && 
-             sum(input$ogMat2[2,]) == 1, 
-           "Rows must be non-negative and sum to 1")
+  ## Dynamically update the probability matrix size ----
+  observeEvent(
+    eventExpr = input$nStates,
+    handlerExpr = {
+      matrixSize <- as.numeric(input$nStates)
+      updateMatrixInput(
+        session = session,
+        inputId = "userMatrix",
+        value = matrix(
+          data = diag(matrixSize),
+          nrow = matrixSize,
+          dimnames = list(0:(matrixSize - 1), 0:(matrixSize - 1))
+        )
       )
-    input$ogMat2
-  })
-  
-  # Handles verification that the entered matrix is a probability matrix for 3x3 
-  ogMat3 <- reactive({
-    validate(
-      need(min(input$ogMat3) >= 0 && sum(input$ogMat3[1,]) == 1 && 
-             sum(input$ogMat3[2,]) == 1 && sum(input$ogMat3[3,]) == 1, 
-           "Rows must sum to 1")
-    )
-    input$ogMat3
-  })
-  
-  # Handles verification that the entered matrix is a probability matrix for 4x4 
-  ogMat4 <- reactive({
-    validate(
-      need(min(input$ogMat4) >= 0 && sum(input$ogMat4[1,]) == 1 && 
-             sum(input$ogMat4[2,]) == 1 && sum(input$ogMat4[3,]) == 1 && 
-             sum(input$ogMat4[4,]) == 1, 
-           "Rows must sum to 1")
-    )
-    input$ogMat4
-  })
-  
-  # Handles verification that the entered matrix is a probability matrix for 5x5
-  ogMat5 <- reactive({
-    validate(
-      need(min(input$ogMat5) >= 0 && sum(input$ogMat5[1,]) == 1 && 
-             sum(input$ogMat5[2,]) == 1 && sum(input$ogMat5[3,]) == 1 && 
-             sum(input$ogMat5[4,]) == 1 && sum(input$ogMat5[5,]) == 1, 
-           "Rows must sum to 1")
-    )
-    input$ogMat5
-  })
-  
-  # Gets the current probability matrix for the calculator based on number of rows
-  getCurrentMatrix <- reactive({
-    if (as.numeric(input$nrows) == 2) {
-        ogMat2()
-    }
-    else if (as.numeric(input$nrows) == 3) {
-      ogMat3()
-    }
-    else if (as.numeric(input$nrows) == 4) {
-      ogMat4()
-    }
-    else{
-      ogMat5()
-    }
-  })
-  
-  # Updates the matrix when the Calculate Matrix button is pressed
-  updateMatrix <- eventReactive(input$subMat, {
-    if (input$nrows == 2) {
-      expr = as.data.frame(matrixcalc::matrix.power(ogMat2(),
-                                                  as.integer(input$steps)), 
-                         row.names = 0:1,
-                         optional = TRUE)} 
-    else if (input$nrows == 3) {
-      as.data.frame(matrixcalc::matrix.power(ogMat3(),as.integer(input$steps)), 
-                    row.names = 0:2, 
-                    optional = TRUE)}
-    else if (input$nrows == 4) {
-      as.data.frame(matrixcalc::matrix.power(ogMat4(), as.integer(input$steps)), 
-                    row.names = 0:3, 
-                    optional = TRUE)} 
-    else {
-      as.data.frame(matrixcalc::matrix.power(ogMat5(),as.integer(input$steps)), 
-                    row.names = 0:4, 
-                    optional = TRUE)}})
-  
-  # Outputted matrix (the one to the nth power)
-  output$mat <- renderTable({
-    updateMatrix()}, rownames = TRUE, striped = FALSE
+    },
+    ignoreNULL = TRUE,
+    ignoreInit = TRUE
   )
-
-  # PROBLEMS ----
-  # All of the variables that will be tracked in the various scenarios
-  game <- reactiveValues(score = 0, context = "", probw1 = 0, probw2 = 0, 
-                         probSLRG = 0, probSLGY = 0, probSLGR = 0, probSLGG = 0,
-                         probSLYY = 0, probSLYR = 0, probSLYG = 0,
-                         probSLRY = 0, probSLRR = 0, probCandy = 0, 
-                         probCookie = 0, inLab = "", correctMat = diag(2), 
-                         correctMatSL = diag(3), correctMatC = diag(2),
-                         showFeedback = F)
   
-  # WEATHER
+  ## Calculate result matrix ----
+  observeEvent(
+    eventExpr = input$subMat,
+    handlerExpr = {
+      if (any(input$userMatrix < 0)) {
+        ### Check if there are any negative values
+        sendSweetAlert(
+          session = session,
+          type = "error",
+          title = "Negative Probabilities",
+          "There is at least one negative probability value detected in your matrix.
+          Please double check and fix any entries."
+        )
+      } else if (any(rowSums(input$userMatrix) != 1)) {
+        ### Check rows add to 1
+        sendSweetAlert(
+          session = session,
+          type = "error",
+          title = "Rows Don't Add to One",
+          "There is at least one row that does not add to one. Please double
+          check and fix any entries."
+        )
+      } else if (input$steps < 0) {
+        ### Check if number of steps is negative
+        sendSweetAlert(
+          session = session,
+          type = "error",
+          title = "Negative Number of Steps",
+          "You've asked for a negative number of steps. Please double
+          check and put in a whole number of steps."
+        )
+      } else {
+        ### Check if the number of steps is a whole number and change input if not
+        if (!is.integer(input$steps)) {
+          updateNumericInput(
+            session = session,
+            inputId = "steps",
+            value = as.integer(input$steps)
+          )
+        }
+        
+        ### Calculate the new matrix
+        calculatedMatrix(
+          round(
+            x = matrixcalc::matrix.power(
+              x = input$userMatrix,
+              k = as.integer(input$steps)
+            ),
+            digits = 4
+          )
+        )
+        
+        ### Display the new matrix
+        output$calcMatrix <- DT::renderDT(
+          expr = {
+            validate(
+              need(
+                expr = !is.null(calculatedMatrix()),
+                message = "Click the Calculate matrix button to see the matrix."
+              )
+            )
+            calculatedMatrix()
+          },
+          caption = paste(
+            "Your matrix", isolate(as.integer(input$steps)), "step(s) out"
+          ),
+          style = "bootstrap4",
+          options = list(
+            responsive = TRUE,
+            scrollX = FALSE,
+            ordering = FALSE,
+            paging = FALSE,
+            lengthChange = FALSE,
+            searching = FALSE,
+            info = FALSE
+          )
+        )
+      } 
+    },
+    ignoreNULL = FALSE,
+    ignoreInit = FALSE
+  )
+  
+  ## Hide calculated matrix if inputs get changed ----
+  observeEvent(
+    eventExpr = c(input$nStates, input$userMatrix),
+    handlerExpr = {
+      calculatedMatrix(NULL)
+    }
+  )
+  
+  ## Set up tab problems/contexts ----
+  # All of the variables that will be tracked in the various scenarios
+  game <- reactiveValues(
+    score = 0, context = "", probw1 = 0, probw2 = 0, 
+    probSLRG = 0, probSLGY = 0, probSLGR = 0, probSLGG = 0,
+    probSLYY = 0, probSLYR = 0, probSLYG = 0,
+    probSLRY = 0, probSLRR = 0, probCandy = 0, 
+    probCookie = 0, inLab = "", correctMat = diag(2), 
+    correctMatSL = diag(3), correctMatC = diag(2),
+    showFeedback = FALSE
+  )
+  
+  ### Weather context ----
   # Sets the variables for the weather scenario
   weatherVars <- reactive({
     game$probW1 <- sample(c(.5, .6, .7, .8, .9), size = 1, replace = T)
@@ -1147,7 +1161,7 @@ server <- function(input, output, session) {
                Rain = rainSum/(index + 1), 
                None = 1 - rainSum/(index + 1))
   })
-  
+  #### Plots ----
   # Create the daily weather plot for first week
   output$weatherDaily <- renderPlot({
       plot <- ggplot2::ggplot(aes(x = day, y = state), data = weatherSteps()[1:31,]) +
@@ -1210,7 +1224,8 @@ server <- function(input, output, session) {
             axis.title = element_text(size = 18),
             panel.background = element_rect(fill = "white", color = "black"),
             legend.text = element_text(size = 14),
-            legend.title = element_text(size = 16)
+            legend.title = element_text(size = 16),
+            legend.position = "bottom"
       )
     plot
   })
@@ -1226,7 +1241,7 @@ server <- function(input, output, session) {
       )))
   })
   
-  # STOP LIGHTS
+  ### Traffic lights context ----
   # Resets the probabilities of Green, Red, or Yellow lights
   # The double letter pair at the end of each name stands for the color to color
   # Ex. YG means the probability of transitioning from a yellow to a green light
@@ -1415,7 +1430,7 @@ server <- function(input, output, session) {
                Yellow = yellows, 
                Red = reds)
   })
-
+  #### Plots ----
   # Create plot for all 10 lights by state
   output$lightDaily <- renderPlot({
     plot <- ggplot2::ggplot(aes(x = day, y = state), data = lightSteps()) +
@@ -1488,7 +1503,8 @@ server <- function(input, output, session) {
             axis.title = element_text(size = 18),
             panel.background = element_rect(fill = "white", color = "black"),
             legend.text = element_text(size = 14),
-            legend.title = element_text(size = 16)
+            legend.title = element_text(size = 16),
+            legend.position = "bottom"
       )
     plot
   })
@@ -1504,7 +1520,7 @@ server <- function(input, output, session) {
       )))
   })
   
-  # CANDY
+  ### Candy (or cookies) context ----
   # Assign probabilities to the candy/cookies problem
   createCandy <- reactive({
     game$probCandy <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
@@ -1657,6 +1673,7 @@ server <- function(input, output, session) {
       )))
   })
   
+  #### Plots ----
   # Plots the cumulative proportion of candy and cookie chosen
   output$candyCumulativeProb <- renderPlot({
     data <- pivot_longer(candySteps(), 
@@ -1682,14 +1699,15 @@ server <- function(input, output, session) {
       scale_colour_manual(values = boastUtils::boastPalette) +
       geom_path(lwd = 1) +
       xlab("Student") +
-      ylab('Cumulative portion by choice type') +
+      ylab('Cumulative portion by choice') +
       ggtitle("Portion Student Choices") +
       theme(axis.text = element_text(size = 18),
             plot.title = element_text(size = 18, face = "bold"),
             axis.title = element_text(size = 18),
             panel.background = element_rect(fill = "white", color = "black"),
             legend.text = element_text(size = 14),
-            legend.title = element_text(size = 16)
+            legend.title = element_text(size = 16),
+            legend.position = "bottom"
       )
     plot
   })
@@ -1707,5 +1725,5 @@ server <- function(input, output, session) {
 }
   
 
-# Create Shiny App using BOAST App template
+# Boast app call ----
 boastUtils::boastApp(ui = ui, server = server)
