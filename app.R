@@ -11,6 +11,18 @@ library(tidyr)
 library(matrixcalc)
 library(DT)
 
+## Global functions ----
+calcAnswer <- function(pMatrix, power, element, digits = 2){
+  raisedMat <- matrixcalc::matrix.power(x = pMatrix, k = power)
+  targetValue <- raisedMat[element[1], element[2]]
+  return(round(targetValue, digits = digits))
+}
+
+gameAns <- function(correctMat, start, pow, col = 1){
+  matrixcalc::matrix.power(correctMat, pow)[start, col]
+}
+
+
 # Function for showing the check or X based on a condition
 # Input: boolean for whether the condition is true or false
 # Output: appropriate image
@@ -46,12 +58,13 @@ ui <- list(
     ),
     ## Sidebar ----
     dashboardSidebar(
+      width = 250,
       sidebarMenu(
         id = "pages",
-        menuItem("Overview", tabName = "Overview", icon = icon("tachometer-alt")),
-        menuItem("Prerequisites", tabName = "Prerequisites", icon = icon("book")),
-        menuItem("Explore", tabName = "Explore", icon = icon("wpexplorer")),
-        menuItem("References", tabName = "References", icon = icon("leanpub"))
+        menuItem("Overview", tabName = "overview", icon = icon("tachometer-alt")),
+        menuItem("Prerequisites", tabName = "prerequisites", icon = icon("book")),
+        menuItem("Explore", tabName = "explore", icon = icon("wpexplorer")),
+        menuItem("References", tabName = "references", icon = icon("leanpub"))
       ),
       tags$div(
         class = "sidebar-logo",
@@ -63,7 +76,7 @@ ui <- list(
       tabItems(
         ### Overview Page ----
         tabItem(
-          tabName = "Overview",
+          tabName = "overview",
           withMathJax(),
           h1("Convergence of Discrete-Time Markov Chains"), 
           p("In this app you will explore how a discrete time Markov Chain 
@@ -107,7 +120,7 @@ ui <- list(
         ), 
         ### Prerequisites Page ----
         tabItem(
-          tabName = "Prerequisites",
+          tabName = "prerequisites",
           withMathJax(),
           h2("Prerequisites"), 
           p("Review information about the convergence of discrete time Markov
@@ -416,7 +429,7 @@ ui <- list(
         ), 
         ### Explore Page ----
         tabItem(
-          tabName = "Explore",
+          tabName = "explore",
           withMathJax(),
           h2("Explore Discrete Time Markov Chains and Their Long Run Behavior"),
           p("In this section, you will explore the behavior of Discrete Time 
@@ -476,7 +489,7 @@ ui <- list(
             column(
               width = 8,
               offset = 0,
-              DT::DTOutput(outputId = "calcMatrix", width = "50%"),
+              DTOutput(outputId = "calcMatrix", width = "50%"),
             )
           ),
           br(),
@@ -490,17 +503,15 @@ ui <- list(
               br(),
               ##### Candy ----
               h3("Candy or Cookies"),
-              textOutput("candyProb"), 
+              uiOutput("candyProb"), 
               br(),
               fluidRow(
                 column(
                   width = 5,
                   offset = 0,
                   fluidRow(
-                    ##### Improve here----
-                    ## rethink layout of question/answer mark
                     column(
-                      width = 9, 
+                      width = 8, 
                       numericInput(
                         inputId = "child1Prob", 
                         label = "Probability that the next child chooses candy", 
@@ -511,14 +522,14 @@ ui <- list(
                       )
                     ),
                     column(
-                      width = 3, 
+                      width = 4, 
                       br(), 
                       uiOutput("correctnessChild1")
                     )
                   ),
                   fluidRow(
                     column(
-                      width = 9, 
+                      width = 8, 
                       numericInput(
                         inputId = "child5Prob", 
                         label = "Probability that the fifth child chooses candy", 
@@ -529,50 +540,64 @@ ui <- list(
                       )
                     ),
                     column(
-                      width = 3, 
+                      width = 4, 
                       br(), 
                       uiOutput("correctnessChild5")
                     )
                   ),
                   fluidRow(
                     column(
-                      width = 10, 
+                      width = 8, 
                       numericInput(
                         inputId = "child10Prob", 
                         label = "Probability that the tenth child chooses candy", 
                         value = NA,
                         min = 0,
                         max = 1,
-                        step = .01)),
+                        step = .01)
+                    ),
                     column(
-                      width = 2, 
+                      width = 4, 
                       br(), 
-                      uiOutput("correctnessChild10"))),
+                      uiOutput("correctnessChild10")
+                    )
+                  ),
                   fluidRow(
                     column(
-                      width = 10, 
+                      width = 8, 
                       numericInput(
                         inputId = "child20Prob", 
                         label = "Probability that the last child chooses candy", 
                         value = NA,
                         min = 0,
                         max = 1,
-                        step = .01)),
+                        step = .01
+                      )
+                    ),
                     column(
-                      width = 2,
+                      width = 4,
                       br(), 
-                      uiOutput("correctnessChild20"))),
-                  
-                  bsButton(
-                    inputId = "checkCandy", 
-                    label = "Check answer",
-                    size = "large"
+                      uiOutput("correctnessChild20")
+                    )
                   ),
-                  bsButton(
-                    inputId = "newCandy", 
-                    label = "New problem",
-                    size = "large",
-                    icon = icon("retweet")
+                  fluidRow(
+                    column(
+                      width = 4,
+                      bsButton(
+                        inputId = "checkCandy", 
+                        label = "Check answer",
+                        size = "large"
+                      )
+                    ),
+                    column(
+                      width = 8,
+                      bsButton(
+                        inputId = "newCandy", 
+                        label = "New problem",
+                        size = "large",
+                        icon = icon("retweet")
+                      )
+                    )
                   )
                 ),
                 column(
@@ -583,16 +608,13 @@ ui <- list(
                   ),
                   conditionalPanel( 
                     condition = "input.showCandyPlots",
-                    plotOutput("candyDaily", height = '250px'),
-                    ##### Improvement here ----
-                    ## Update the alt text to new approaches
-                    htmlOutput("candyDailyAlt"),
-                    plotOutput("candyCumulativeProb", height = '300px'),
-                    htmlOutput("candyCumulativeAlt"),
+                    plotOutput(outputId = "candyClass", height = "250px"),
+                    plotOutput("candyCumulative", height = "300px"),
                     bsButton(
                       inputId = "newCandyPlotSamples", 
                       label = "New Sample Path",
-                      size = "large"
+                      size = "large",
+                      icon = icon("retweet")
                     )
                   )
                 )
@@ -607,205 +629,277 @@ ui <- list(
               br(),
               fluidRow(
                 column(
-                  width = 4,
+                  width = 3,
                   numericInput(
                     inputId = "TLG1", 
                     label = "Probability of Next Light Green", 
                     value = NA,
                     min = 0,
                     max = 1,
-                    step = .01)),
+                    step = .01
+                  )
+                ),
                 column(
                   width = 1, 
                   br(), 
-                  uiOutput("correctnessLG1")),
+                  uiOutput("correctnessLG1")
+                ),
+                column(
+                  width = 3,
+                  offset = 2,
+                  numericInput(
+                    inputId = "TLR1", 
+                    label = "Probability of Next Light Red", 
+                    value = NA,
+                    min = 0,
+                    max = 1,
+                    step = .01
+                  )
+                ),
+                column(
+                  width = 1,
+                  br(),
+                  uiOutput("correctnessLR1")
+                )
+              ),
+              fluidRow(
+                column(
+                  width = 3,
+                  numericInput(
+                    inputId = "TLG5", 
+                    label = "Probability of Fifth Light from Now Green", 
+                    value = NA,
+                    min = 0,
+                    max = 1,
+                    step = .01
+                  )
+                ),
+                column(
+                  width = 1,
+                  br(), 
+                  uiOutput("correctnessLG5")
+                ),
+                column(
+                  width = 3,
+                  offset = 2,
+                  numericInput(
+                    inputId = "TLR5", 
+                    label = "Probability of Fifth Light from Now Red", 
+                    value = NA,
+                    min = 0,
+                    max = 1,
+                    step = .01
+                  )
+                ),
+                column(
+                  width = 1,
+                  br(), 
+                  uiOutput("correctnessLR5")
+                )
+              ),
+              fluidRow(
+                column(
+                  width = 3,
+                  numericInput(
+                    inputId = "TLG9", 
+                    label = "Probability of Last Light Green", 
+                    value = NA,
+                    min = 0,
+                    max = 1,
+                    step = .01
+                  )
+                ),
+                column(
+                  width = 1,
+                  br(),
+                  uiOutput("correctnessLG9")
+                ),
+                column(
+                  width = 3,
+                  offset = 2,
+                  numericInput(
+                    inputId = "TLR9", 
+                    label = "Probability of Last Light Red", 
+                    value = NA,
+                    min = 0,
+                    max = 1,
+                    step = .01
+                  )
+                ),
+                column(
+                  width = 1,
+                  br(), 
+                  uiOutput("correctnessLR9")
+                )
+              ),
+              fluidRow(
+                column(
+                  width = 2,
+                  bsButton(
+                    inputId = "checkTraffic", 
+                    label = "Check Answer",
+                    size = "large"
+                  )
+                ),
+                column(
+                  width = 2,
+                  bsButton(
+                    inputId = "newTraffic", 
+                    label = "New Problem",
+                    size = "large",
+                    icon = icon("retweet")
+                  )
+                )
+              ),
+              checkboxInput(
+                inputId = "showTrafficPLots", 
+                label = "Show plots for light sample paths"
+              ),
+              ##### Improvement here ----
+              ## Update the alt text to new approaches
+              conditionalPanel( 
+                condition = "input.showTrafficPLots",
+                plotOutput("lightDaily", height = '250px'),
+                htmlOutput("lightDailyAlt"),
+                plotOutput("lightCumulativeProb", height = '300px'),
+                htmlOutput("lightCumulativeAlt"),
+                bsButton(
+                  inputId = "newLightPlotSamples", 
+                  label = "New Sample Path",
+                  size = "large",
+                  icon = icon("retweet")
+                )
+              )
+            ),
+            ##### Weather ----
+            tabPanel(
+              title = "Weather",
+              br(),
+              h2("Rain or No Rain"),
+              uiOutput("weatherProb"),
+              fluidRow(
                 column(
                   width = 4,
-                numericInput(
-                  inputId = "TLR1", 
-                  label = "Probability of Next Light Red", 
-                  value = NA,
-                  min = 0,
-                  max = 1,
-                  step = .01)),
-              column(
-                width = 1,
-                br(),
-                uiOutput("correctnessLR1"))),
-            fluidRow(  
-              column(
-                width = 4,
-                numericInput(
-                  inputId = "TLG5", 
-                  label = "Probability of Fifth Light from Now Green", 
-                  value = NA,
-                  min = 0,
-                  max = 1,
-                  step = .01)
-              ),
-              column(
-                width = 1,
-                br(), 
-                uiOutput("correctnessLG5")),
-              column(
-                width = 4,
-                numericInput(
-                  inputId = "TLR5", 
-                  label = "Probability of Fifth Light from Now Red", 
-                  value = NA,
-                  min = 0,
-                  max = 1,
-                  step = .01)),
-              column(
-                width = 1,
-                br(), 
-                uiOutput("correctnessLR5"))
-            ),
-            fluidRow(  
-              column(
-                width = 4,
-                numericInput(
-                  inputId = "TLG9", 
-                  label = "Probability of Last Light Green", 
-                  value = NA,
-                  min = 0,
-                  max = 1,
-                  step = .01)
-              ),
-              column(
-                width = 1,
-                br(),
-                uiOutput("correctnessLG9")),
-              column(
-                width = 4,
-                numericInput(
-                  inputId = "TLR9", 
-                  label = "Probability of Last Light Red", 
-                  value = NA,
-                  min = 0,
-                  max = 1,
-                  step = .01)),
-              column(
-                width = 1,
-                br(), 
-                uiOutput("correctnessLR9"))
-            ),
-            actionButton(
-              inputId = "checkGameLights", 
-              label = "Check Answer"),
-            actionButton(
-              inputId = "newLights", 
-              label = "New Problem"),
-            checkboxInput(
-              inputId = "showLightPlots", 
-              label = "Show plots for light sample paths"),
-            conditionalPanel( 
-              condition = "input.showLightPlots",
-              plotOutput("lightDaily", height = '250px'),
-              htmlOutput("lightDailyAlt"),
-              plotOutput("lightCumulativeProb", height = '300px'),
-              htmlOutput("lightCumulativeAlt"),
-              actionButton(
-                inputId = "newLightPlotSamples", 
-                label = "New Sample Path"))
-          ),
-          ##### Weather ----
-          tabPanel(
-            title = "Weather",
-            br(),
-            h2("Rain or No Rain"),
-            textOutput("weatherProb"),
-            p("Today, it rained. Calculate the probability that it will rain 
-              each of the following days."),
-            fluidRow(
-              column(
-                width = 5,
                   fluidRow(
                     column(
-                      width = 10, 
+                      width = 8, 
                       numericInput(
                         inputId = "tomorrowProb1", 
-                         label = "Probability of Rain Tomorrow", 
-                         value = NA,
-                         min = 0,
-                         max = 1,
-                         step = .01)
-                    ),
-                    column(
-                      width = 2, 
-                      br(), 
-                      uiOutput("correctnessW1"))),
-                  fluidRow(
-                    column(
-                      width = 10, 
-                        numericInput(
-                          inputId = "weekProb1", 
-                          label = "Probability of Rain One Week from Now", 
-                          value = NA,
-                          min = 0,
-                          max = 1,
-                          step = .01)),
-                    column(width = 2,
-                           br(), 
-                           uiOutput("correctnessW2"))),
-                  fluidRow(
-                    column(
-                      width = 10, 
-                      numericInput(
-                        inputId = "monthProb1", 
-                        label = "Probability of Rain One Month from Now", 
+                        label = "Probability of rain tomorrow", 
                         value = NA,
                         min = 0,
                         max = 1,
-                        step = .01)),
-                    column(width = 2, 
-                           br(), 
-                           uiOutput("correctnessW3"))),
+                        step = .01
+                      )
+                    ),
+                    column(
+                      width = 4, 
+                      br(), 
+                      uiOutput("correctnessW1")
+                    )
+                  ),
                   fluidRow(
                     column(
-                      width = 10, 
+                      width = 8, 
                       numericInput(
-                       inputId = "yearProb1", 
-                       label = "Probability of Rain One Year from Now", 
-                       value = NA,
-                       min = 0,
-                       max = 1,
-                       step = .01)),
+                        inputId = "weekProb1", 
+                        label = "Probability of rain one week from today", 
+                        value = NA,
+                        min = 0,
+                        max = 1,
+                        step = .01
+                      )
+                    ),
                     column(
-                      width = 2,
+                      width = 4,
                       br(), 
-                      uiOutput("correctnessW4"))),
-                  
-                    bsButton(
-                      inputId = "checkGame",
-                      label = "Check Answer"),
-                    bsButton(
-                      inputId = "newWeather", 
-                      label = "New Problem")),
-                  column(
-                    width = 6,
-                    checkboxInput(
-                      inputId = "showWeatherPlots", 
-                      label = "Show plots for weather sample paths"),
-                    conditionalPanel( 
-                      condition = "input.showWeatherPlots",
-                      plotOutput("weatherDaily", height = '250px'), 
-                      htmlOutput("weatherDailyAlt"),
-                      plotOutput("weatherCumulativeProb", height = '300px'),
-                      htmlOutput("weatherCumulativeAlt"),
+                      uiOutput("correctnessW2")
+                    )
+                  ),
+                  fluidRow(
+                    column(
+                      width = 8, 
+                      numericInput(
+                        inputId = "monthProb1", 
+                        label = "Probability of rain one month from today", 
+                        value = NA,
+                        min = 0,
+                        max = 1,
+                        step = .01
+                      )
+                    ),
+                    column(
+                      width = 4, 
+                      br(), 
+                      uiOutput("correctnessW3")
+                    )
+                  ),
+                  fluidRow(
+                    column(
+                      width = 8, 
+                      numericInput(
+                        inputId = "yearProb1", 
+                        label = "Probability of rain one year from today", 
+                        value = NA,
+                        min = 0,
+                        max = 1,
+                        step = .01
+                      )
+                    ),
+                    column(
+                      width = 4,
+                      br(), 
+                      uiOutput("correctnessW4")
+                    )
+                  ),
+                  fluidRow(
+                    column(
+                      width = 6,
                       bsButton(
-                        inputId  = "newWeatherPlotSamples", 
-                        label = "New Sample Path"))
+                        inputId = "checkWeather",
+                        label = "Check Answer",
+                        size = "large"
+                      )
+                    ),
+                    column(
+                      width = 6,
+                      bsButton(
+                        inputId = "newWeather", 
+                        label = "New Problem",
+                        size = "large",
+                        icon = icon("retweet")
+                      )
+                    )
+                  )
+                ),
+                column(
+                  width = 8,
+                  checkboxInput(
+                    inputId = "showWeatherPlots", 
+                    label = "Show plots for weather sample paths"
+                  ),
+                  conditionalPanel( 
+                    condition = "input.showWeatherPlots",
+                    plotOutput(outputId = "weatherMonth", height = "250px"),
+                    plotOutput(outputId = "weatherYear", height = "300px"),
+                    bsButton(
+                      inputId  = "newWeatherPlotSamples", 
+                      label = "New Sample Path",
+                      size = "large",
+                      icon = icon("retweet")
+                    )
                   )
                 )
               )
             )
-          ),
+          )
+        ),
         ### References Page ----
         tabItem(
-          tabName = "References",
+          tabName = "references",
           withMathJax(),
           h2("References"),
+          #### Update after rest of improvements ----
           p(
             class = "hangingindent", 
             "Attali, D. (2020), shinyjs: Easily Improve the User Experience of 
@@ -876,7 +970,20 @@ ui <- list(
 
 # Define server logic ----
 server <- function(input, output, session) {
+  ## Set user specific elements ----
+  ### power matrix
   calculatedMatrix <- reactiveVal(NULL)
+
+  ### All of the variables that will be tracked in the various scenarios
+  game <- reactiveValues(
+    score = 0, context = "", probw1 = 0, probw2 = 0, 
+    probSLRG = 0, probSLGY = 0, probSLGR = 0, probSLGG = 0,
+    probSLYY = 0, probSLYR = 0, probSLYG = 0,
+    probSLRY = 0, probSLRR = 0, probCandy = 0, 
+    probCookie = 0, inLab = "", correctMat = diag(2), 
+    correctMatSL = diag(3), correctMatC = diag(2),
+    showFeedback = FALSE
+  )
   
   ## info button ----
   observeEvent(
@@ -901,7 +1008,7 @@ server <- function(input, output, session) {
       updateTabItems(
         session = session, 
         inputId = "pages", 
-        selected = "Prerequisites" 
+        selected = "prerequisites" 
       ) 
     })
   
@@ -912,11 +1019,12 @@ server <- function(input, output, session) {
       updateTabItems(
         session = session, 
         inputId = "pages", 
-        selected = "Explore" 
+        selected = "explore" 
       ) 
     })
   
-  ## Dynamically update the probability matrix size ----
+  ## Probability Matrix Calculator ----
+  ### Dynamically update the probability matrix size ----
   observeEvent(
     eventExpr = input$nStates,
     handlerExpr = {
@@ -935,7 +1043,7 @@ server <- function(input, output, session) {
     ignoreInit = TRUE
   )
   
-  ## Calculate result matrix ----
+  ### Calculate result matrix ----
   observeEvent(
     eventExpr = input$subMat,
     handlerExpr = {
@@ -988,7 +1096,7 @@ server <- function(input, output, session) {
         )
         
         ### Display the new matrix
-        output$calcMatrix <- DT::renderDT(
+        output$calcMatrix <- renderDT(
           expr = {
             validate(
               need(
@@ -1018,7 +1126,7 @@ server <- function(input, output, session) {
     ignoreInit = FALSE
   )
   
-  ## Hide calculated matrix if inputs get changed ----
+  ### Hide calculated matrix if inputs get changed ----
   observeEvent(
     eventExpr = c(input$nStates, input$userMatrix),
     handlerExpr = {
@@ -1026,221 +1134,602 @@ server <- function(input, output, session) {
     }
   )
   
-  ## Set up tab problems/contexts ----
-  # All of the variables that will be tracked in the various scenarios
-  game <- reactiveValues(
-    score = 0, context = "", probw1 = 0, probw2 = 0, 
-    probSLRG = 0, probSLGY = 0, probSLGR = 0, probSLGG = 0,
-    probSLYY = 0, probSLYR = 0, probSLYG = 0,
-    probSLRY = 0, probSLRR = 0, probCandy = 0, 
-    probCookie = 0, inLab = "", correctMat = diag(2), 
-    correctMatSL = diag(3), correctMatC = diag(2),
-    showFeedback = FALSE
+  ## Candy Scenario ----
+  ### Generate initial values ----
+  candyValues <- reactiveValues(
+    probCandy = 5, # Prob(Candy|Cookie)
+    probCookie = 5, # Prob(Cookie|Cookie)
+    probMatrix = diag(1),
+    validAnswers = FALSE
   )
   
-  ### Weather context ----
-  # Sets the variables for the weather scenario
-  weatherVars <- reactive({
-    game$probW1 <- sample(c(.5, .6, .7, .8, .9), size = 1, replace = T)
-    game$probW2 <- sample(c(.5, .4, .3, .2, .1), size = 1, replace = T)
-    game$correctMat <- matrix(c(game$probW1, 1 - game$probW1, 
-                                game$probW2, 1 - game$probW2),
-                              nrow = 2, byrow = TRUE)
-  })
+  observeEvent(
+    eventExpr = input$newCandy,
+    handlerExpr = {
+      candyValues$probCandy <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
+      candyValues$probCookie <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
+      candyValues$probMatrix <- matrix(
+        data = c(candyValues$probCandy, 1 - candyValues$probCandy,
+                 1 - candyValues$probCookie, candyValues$probCookie),
+        nrow = 2,
+        byrow = TRUE
+      )
+    },
+    ignoreNULL = FALSE,
+    ignoreInit = FALSE
+  )
   
-  # Used to get answers to the questions
-  # Takes matrix correctMat to power pow then reads element [start, col]
-  gameAns <- function(correctMat, start, pow, col = 1){
-    matrixcalc::matrix.power(correctMat, pow)[start, col]
-  }
-  
-  # Picture to go with weather question 1 (x or check)
-  output$correctnessW1 <- renderUI(if (game$showFeedback) {
-    correctnessPic(!(is.na(input$tomorrowProb1)) && 
-                     round(input$tomorrowProb1,2) == 
-                     round(gameAns(correctMat = game$correctMat, 
-                                   start = 1, 
-                                   pow = 1),2))}) 
-  
-  # Picture to go with weather question 2 (x or check)
-  output$correctnessW2 <- renderUI(if (game$showFeedback) {
-    correctnessPic(!(is.na(input$weekProb1)) && 
-                     round(input$weekProb1, 2) == 
-                     round(gameAns(correctMat = game$correctMat, 
-                                   start = 1, 
-                                   pow = 7), 2))})
-  
-  # Picture to go with weather question 3 (x or check)
-  output$correctnessW3 <- renderUI(if (game$showFeedback) {
-    correctnessPic(!(is.na(input$monthProb1)) && 
-                     round(input$monthProb1, 2) == 
-                     round(gameAns(correctMat = game$correctMat, 
-                                   start  = 1, 
-                                   pow = 30), 2))})
-  
-  # Picture to go with weather question 4 (x or check)
-  output$correctnessW4 <- renderUI(if (game$showFeedback) {
-    correctnessPic(!(is.na(input$yearProb1)) && 
-                     round(input$yearProb1, 2) == 
-                     round(gameAns(correctMat = game$correctMat, 
-                                   start = 1, 
-                                   pow = 365), 2))})
-
-  # Show feedback after Check Game but reset to no feedback if any input is changed
-  observeEvent(input$checkGame, {game$showFeedback <- T})
-  observeEvent(input$tomorrowProb1, {game$showFeedback <- F})
-  observeEvent(input$weekProb1, {game$showFeedback <- F})
-  observeEvent(input$monthProb1, {game$showFeedback <- F})
-  observeEvent(input$yearProb1, {game$showFeedback <- F})
-  
-  # Mostly here to make sure the weather vars get set at the beginning
-  observeEvent(input$pages, {click("newWeather")})
-  
-  # Statement for the weather problem
-  output$weatherProb <- renderText({
-  paste("Every morning, Ben wakes up at 8am and looks out his window to check 
-  the weather. If it rains today, it will rain tomorrow with probability", 
-  game$probW1, "If it doesn't rain today, then it will rain tomorrow with probability", game$probW2,".")})
-  
-  # When user clicks the New Problem button for the weather scenario
-  observeEvent(input$newWeather, {
-    click("newWeatherPlotSamples") # Updates plot
-    game$showFeedback <- F # Hides feedback
-    game$probW1 <- sample(.1*(2:9), size = 1, replace = T) # Updates probabilities
-    # Decides on the probability of no rain after rain; 
-    # make sure it is less than rain to rain
-    if (game$probW1 == .2) {options <- (.01*(1:10))}
-    else{options <- .1*(1:(ceiling(game$probW1*5)))}
-    game$probW2 <- sample(options, size = 1, replace = T)
-    
-    # Updates correct probability matrix based on above
-    game$correctMat <- matrix(c(game$probW1, 1 - game$probW1, 
-                                game$probW2, 1 - game$probW2), 
-                              nrow = 2, byrow = TRUE)
-    
-    # Clear inputs when generating a new problem
-    updateNumericInput(
-      session = session,
-      inputId = "tomorrowProb1",
-      value = NA
-    )
-    updateNumericInput(
-      session = session,
-      inputId = "weekProb1",
-      value = NA
-    )
-    updateNumericInput(
-      session = session,
-      inputId = "monthProb1",
-      value = NA
-    )
-    updateNumericInput(
-      session = session,
-      inputId = "yearProb1",
-      value = NA
-    )
-    })
-  
-  # Do walk of 365 days for weather problem
-  weatherSteps <- eventReactive(input$newWeatherPlotSamples, {
-    curState <- 0
-    index <- 0:365
-    states <- c(0)
-    rainSum <- c(1)
-    
-    # For each day, sample either rain or not based on the day before
-    for (x in 1:365) {
-      curState <- sample(c(0,1), 1, replace = TRUE, prob = game$correctMat[curState + 1,])
-      states <- c(states, curState)
-      rainSum <- c(rainSum, rainSum[x] + 1 - curState)
+  ### Display scenario text ----
+  # Set up text for the candy problem
+  output$candyProb <- renderUI(
+    expr = {
+      div(
+        p(paste0("Mrs. Gamble's kindergarten class has 20 students. One day, she
+             brings in a jar of cookies and a bag of candy and gives each student
+             the choice between either candy or a cookie. Each student then 
+             sequentially chooses a treat. Without any influence from the other
+             students, each student is equally likely to choose either option,
+             but being impressionable young children, the choice of each student
+             is impacted by the choice of the previous student. As such, if the
+             previous student chose candy, then the next student will choose candy
+             with probability ", candyValues$probCandy, ", and if the previous
+             student chose a cookie then the next student will choose a cookie
+             with probability ", candyValues$probCookie, ".")),
+        p("Assuming that the first student chooses a cookie, calculate the
+        following probabilities.")
+      )
     }
-    
-    # Return a data frame with the samples
-    data.frame(day = index, 
-               state = states, 
-               Rain = rainSum/(index + 1), 
-               None = 1 - rainSum/(index + 1))
-  })
-  #### Plots ----
-  # Create the daily weather plot for first week
-  output$weatherDaily <- renderPlot({
-      plot <- ggplot2::ggplot(aes(x = day, y = state), data = weatherSteps()[1:31,]) +
+  )
+  
+  ### Check answers ----
+  observeEvent(
+    eventExpr = input$checkCandy,
+    handlerExpr = {
+      if (any(is.na(input$child1Prob), is.na(input$child5Prob),
+              is.na(input$child10Prob), is.na(input$child20Prob))) {
+        sendSweetAlert(
+          session = session,
+          title = "Missing Values",
+          type = "warning",
+          text = "You have one or more answers missing. Please answer all questions
+          before checking all answers."
+        )
+        candyValues$validAnswers <- FALSE
+      } else if (any(input$child1Prob < 0, input$child5Prob < 0,
+                     input$child10Prob < 0, input$child20Prob < 0)) {
+        sendSweetAlert(
+          session = session,
+          title = "Negative Probabilities",
+          type = "error",
+          text = "At least one of your answers is a negative value. Please check
+          your answers and fix accordingly."
+        )
+        candyValues$validAnswers <- FALSE
+      } else if (any(input$child1Prob > 1, input$child5Prob > 1,
+                     input$child10Prob > 1, input$child20Prob > 1)) {
+        sendSweetAlert(
+          session = session,
+          title = "Probabilities Greater Than 1",
+          type = "error",
+          text = "At least one of your answers a values greater than 1. Please check
+          your answers and fix accordingly."
+        )
+        candyValues$validAnswers <- FALSE
+      } else {
+        candyValues$validAnswers <- TRUE
+        output$correctnessChild1 <- renderIcon(
+          icon = ifelse(
+            test = round(input$child1Prob, digits = 2) == calcAnswer(
+              pMatrix = candyValues$probMatrix,
+              power = 1,
+              element = c(2,1),
+              digits = 2
+            ),
+            yes = "correct",
+            no = "incorrect"
+          ),
+          width = 48
+        )
+        output$correctnessChild5 <- renderIcon(
+          icon = ifelse(
+            test = round(input$child5Prob, digits = 2) == calcAnswer(
+              pMatrix = candyValues$probMatrix,
+              power = 5,
+              element = c(2,1),
+              digits = 2
+            ),
+            yes = "correct",
+            no = "incorrect"
+          ),
+          width = 48
+        )
+        output$correctnessChild10 <- renderIcon(
+          icon = ifelse(
+            test = round(input$child10Prob, digits = 2) == calcAnswer(
+              pMatrix = candyValues$probMatrix,
+              power = 10,
+              element = c(2,1),
+              digits = 2
+            ),
+            yes = "correct",
+            no = "incorrect"
+          ),
+          width = 48
+        )
+        output$correctnessChild20 <- renderIcon(
+          icon = ifelse(
+            test = round(input$child20Prob, digits = 2) == calcAnswer(
+              pMatrix = candyValues$probMatrix,
+              power = 20,
+              element = c(2,1),
+              digits = 2
+            ),
+            yes = "correct",
+            no = "incorrect"
+          ),
+          width = 48
+        )
+      }
+    },
+    ignoreNULL = TRUE,
+    ignoreInit = FALSE
+  )
+  
+  ### Hide answers when inputs change ----
+  observeEvent(
+    eventExpr = c(input$child1Prob, input$child5Prob,
+                  input$child10Prob, input$child20Prob),
+    handlerExpr = {
+      if (candyValues$validAnswers) {
+        output$correctnessChild1 <- renderIcon()
+        output$correctnessChild5 <- renderIcon()
+        output$correctnessChild10 <- renderIcon()
+        output$correctnessChild20 <- renderIcon()
+      }
+    },
+    ignoreNULL = TRUE,
+    ignoreInit = TRUE
+  )
+  
+  ### Reset answers on new problem ----
+  observeEvent(
+    eventExpr = input$newCandy, 
+    handlerExpr = {
+      updateNumericInput(
+        session = session,
+        inputId = "child1Prob",
+        value = NA
+      )
+      updateNumericInput(
+        session = session,
+        inputId = "child5Prob",
+        value = NA
+      )
+      updateNumericInput(
+        session = session,
+        inputId = "child10Prob",
+        value = NA
+      )
+      updateNumericInput(
+        session = session,
+        inputId = "child20Prob",
+        value = NA
+      )
+    }
+  )
+  
+  ### Create data for plots ----
+  candyData <- eventReactive(
+    eventExpr = c(input$newCandyPlotSamples, candyValues$probCandy),
+    valueExpr = {
+      intData <- data.frame(
+        child = 1:20,
+        state = c(2, rep(0, 19))
+      )
+      for (i in 2:20) {
+        intData$state[i] <- sample(
+          x = c(1,2),
+          size = 1,
+          replace = TRUE,
+          prob = candyValues$probMatrix[intData$state[i - 1], ]
+        )
+      }
+      intData$cCookies <- cumsum(intData$state == 2)
+      intData$cCookieProp <- intData$cCookies / intData$child
+      intData$cCandyProp <- 1 - intData$cCookieProp
+      
+      intData
+    }
+  )
+  
+  ### Display plots ----
+  output$candyClass <- renderPlot(
+    expr = {
+      ggplot(
+        data = candyData(),
+        mapping = aes(x = child, y = state)
+      ) +
         geom_point(size = 2) +
         geom_path() +
-        xlab("Day Number") + 
-        ylab('State') +
-        scale_y_continuous(breaks = 0:1, labels = c("Rain", "No Rain")) +
-        ggtitle("States by Day Over the First Month") +
-        theme(axis.text = element_text(size = 18),
-              plot.title = element_text(size = 18, face = "bold"),
-              axis.title = element_text(size = 18),
-              panel.background = element_rect(fill = "white", color = "black"),
-              legend.position = c(.89,1.07),
-              legend.text = element_text(size = 14),
-              legend.title = element_text(size = 16)
+        theme_bw() +
+        xlab("Child") +
+        ylab("State") +
+        scale_y_continuous(breaks = 1:2, labels = c("Candy", "Cookie")) +
+        ggtitle("Student's Choices in Order") +
+        theme(
+          text = element_text(size = 18)
+        ) +
+        scale_x_continuous(
+          limits = c(1, 20),
+          breaks = c(1, 5, 10, 15, 20),
+          expand = expansion(mult = 0, add = 0.5)
         )
-      plot
-    
-  })
+    },
+    alt = "This plot shows the choice of each student for one simulation of 
+             the process."
+  )
   
-  # Alt-text
-  output$weatherDailyAlt <- renderUI({
-    tags$script(HTML(
-      paste0("$(document).ready(function() {
-            document.getElementById('weatherDaily').setAttribute('aria-label',
-            `This plot shows the weather for one month of samples drawn from
-             the chain in the problem.`)})"
-      )))
-  })
+  output$candyCumulative <- renderPlot(
+    expr = {
+      ggplot(
+        data = candyData(),
+        mapping = aes(x = child)
+      ) +
+        geom_path(
+          mapping = aes(y = cCookieProp, color = "Cookie"),
+          size = 1
+        ) +
+        geom_path(
+          mapping = aes(y = cCandyProp, color = "Candy"),
+          size = 1
+        ) +
+        geom_hline(
+          mapping = aes(
+            color = "Candy",
+            yintercept = calcAnswer(
+              pMatrix = candyValues$probMatrix,
+              power = 500,
+              element = c(2, 1),
+              digits =  2
+            )
+          ),
+          linetype = "dashed",
+          size = 1,
+        ) +
+        geom_hline(
+          mapping = aes(
+            color = "Cookie",
+            yintercept = calcAnswer(
+              pMatrix = candyValues$probMatrix,
+              power = 500,
+              element = c(2, 2),
+              digits =  2
+            )
+          ),
+          linetype = "dashed",
+          size = 1,
+        ) +
+        theme_bw() +
+        xlab("Child") +
+        ylab("Cumulative proportion") +
+        ggtitle("Cumulative Proportion of Choices") +
+        scale_color_manual(
+          name = "Choice",
+          values = boastPalette
+        ) +
+        theme(
+          text = element_text(size = 18),
+          legend.position = "bottom"
+        ) +
+        scale_x_continuous(
+          limits = c(1, 20),
+          breaks = c(1, 5, 10, 15, 20),
+          expand = expansion(mult = 0, add = 0.5)
+        )
+
+    },
+    alt = "This plot shows the cumulative proportion of each student's choice
+            for one simulation. Over time, these proportions get closer to the
+             long run proportions."
+  )
   
-  # Create the plot of cumulative probability for rain and not rain
-  output$weatherCumulativeProb <- renderPlot({
-    data <- pivot_longer(weatherSteps(), 
-                         cols = c("Rain", "None"), 
-                         names_to = "Rain", 
-                         values_to = "Proportion")
-    plot <- ggplot2::ggplot(aes(x = day, y = Proportion, color = Rain), data = data) +
-      geom_hline(aes(yintercept = 1 - gameAns(correctMat = game$correctMat, 
-                                              start = 1, 
-                                              pow = 365)), 
-                 color = boastPalette[1], 
-                 linetype = "dashed", 
-                 lwd = 1, 
-                 show.legend = TRUE) +
-      geom_hline(aes(yintercept = gameAns(correctMat = game$correctMat, 
-                                          start = 1, 
-                                          pow = 365)), 
-                 color = boastPalette[2], 
-                 linetype = "dashed", 
-                 lwd = 1, 
-                 show.legend = TRUE) +
-      scale_colour_manual(values = boastUtils::boastPalette) +
-      geom_path(lwd = 1) +
-      xlab("Day Number") + 
-      ylab('Cumulative portion of rainy days') +
-      ggtitle("Portion of Days of Rain Over Time") +
-      theme(axis.text = element_text(size = 18),
-            plot.title = element_text(size = 18, face = "bold"),
-            axis.title = element_text(size = 18),
-            panel.background = element_rect(fill = "white", color = "black"),
-            legend.text = element_text(size = 14),
-            legend.title = element_text(size = 16),
-            legend.position = "bottom"
+  ## Traffic Scenario ----
+
+  
+  ## Weather Scenario ----
+  ### Generate initial values ----
+  weatherValues <- reactiveValues(
+    probRain = 5, # Prob(Rain|Rain)
+    probNoRain = 5, # Prob(Rain|No rain)
+    probMatrix = diag(1),
+    validAnswers = FALSE
+  )
+
+  observeEvent(
+    eventExpr = input$newWeather,
+    handlerExpr = {
+      weatherValues$probRain <- sample(c(.5, .6, .7, .8, .9), size = 1, replace = T)
+      weatherValues$probNoRain <- sample(c(.5, .4, .3, .2, .1), size = 1, replace = T)
+      weatherValues$probMatrix <- matrix(
+        data = c(weatherValues$probRain, 1 - weatherValues$probRain,
+                 weatherValues$probNoRain, 1 - weatherValues$probNoRain),
+        nrow = 2,
+        byrow = TRUE
       )
-    plot
-  })
-  
-  # Alt-text
-  output$weatherCumulativeAlt <- renderUI({
-    tags$script(HTML(
-      paste0("$(document).ready(function() {
-            document.getElementById('weatherCumulativeProb').setAttribute('aria-label',
-            `This plot shows the cumulative proportion of days of each weather type
+    },
+    ignoreNULL = FALSE,
+    ignoreInit = FALSE
+  )
+
+  ### Display scenario text ----
+  # Set up text for the candy problem
+  output$weatherProb <- renderUI(
+    expr = {
+      div(
+        p(paste0("Every morning, Ben wakes up at 8am and looks out his window to
+             check the weather. If it rains today, it will rain tomorrow with
+             probability ", weatherValues$probRain, ". If it doesn't rain today,
+             then it will rain tomorrow with probability ",
+             weatherValues$probNoRain, ". Treat one month as 30 days and one
+             year as 365 days.")),
+        p("Today, it rained. Calculate the probability that it will rain 
+              each of the following days.")
+      )
+    }
+  )
+
+  ### Check answers ----
+  observeEvent(
+    eventExpr = input$checkWeather,
+    handlerExpr = {
+      if (any(is.na(input$tomorrowProb1), is.na(input$weekProb1),
+              is.na(input$monthProb1), is.na(input$yearProb1))) {
+        sendSweetAlert(
+          session = session,
+          title = "Missing Values",
+          type = "warning",
+          text = "You have one or more answers missing. Please answer all questions
+          before checking all answers."
+        )
+        weatherValues$validAnswers <- FALSE
+      } else if (any(input$tomorrowProb1 < 0, input$weekProb1 < 0,
+                     input$monthProb1 < 0, input$yearProb1 < 0)) {
+        sendSweetAlert(
+          session = session,
+          title = "Negative Probabilities",
+          type = "error",
+          text = "At least one of your answers is a negative value. Please check
+          your answers and fix accordingly."
+        )
+        weatherValues$validAnswers <- FALSE
+      } else if (any(input$tomorrowProb > 1, input$weekProb1 > 1,
+                     input$monthProb1 > 1, input$yearProb1 > 1)) {
+        sendSweetAlert(
+          session = session,
+          title = "Probabilities Greater Than 1",
+          type = "error",
+          text = "At least one of your answers a values greater than 1. Please check
+          your answers and fix accordingly."
+        )
+        weatherValues$validAnswers <- FALSE
+      } else {
+        weatherValues$validAnswers <- TRUE
+        output$correctnessW1 <- renderIcon(
+          icon = ifelse(
+            test = round(input$tomorrowProb1, digits = 2) == calcAnswer(
+              pMatrix = weatherValues$probMatrix,
+              power = 1,
+              element = c(1,1),
+              digits = 2
+            ),
+            yes = "correct",
+            no = "incorrect"
+          ),
+          width = 48
+        )
+        output$correctnessW2 <- renderIcon(
+          icon = ifelse(
+            test = round(input$weekProb1, digits = 2) == calcAnswer(
+              pMatrix = weatherValues$probMatrix,
+              power = 7,
+              element = c(1,1),
+              digits = 2
+            ),
+            yes = "correct",
+            no = "incorrect"
+          ),
+          width = 48
+        )
+        output$correctnessW3 <- renderIcon(
+          icon = ifelse(
+            test = round(input$monthProb1, digits = 2) == calcAnswer(
+              pMatrix = weatherValues$probMatrix,
+              power = 30,
+              element = c(1,1),
+              digits = 2
+            ),
+            yes = "correct",
+            no = "incorrect"
+          ),
+          width = 48
+        )
+        output$correctnessW4 <- renderIcon(
+          icon = ifelse(
+            test = round(input$yearProb1, digits = 2) == calcAnswer(
+              pMatrix = weatherValues$probMatrix,
+              power = 365,
+              element = c(1,1),
+              digits = 2
+            ),
+            yes = "correct",
+            no = "incorrect"
+          ),
+          width = 48
+        )
+      }
+    },
+    ignoreNULL = TRUE,
+    ignoreInit = FALSE
+  )
+
+  ### Hide answers when inputs change ----
+  observeEvent(
+    eventExpr = c(input$tomorrowProb1, input$weekProb1,
+                  input$monthProb1, input$yearProb1),
+    handlerExpr = {
+      if (weatherValues$validAnswers) {
+        output$correctnessW1 <- renderIcon()
+        output$correctnessW2 <- renderIcon()
+        output$correctnessW3 <- renderIcon()
+        output$correctnessW4 <- renderIcon()
+      }
+    },
+    ignoreNULL = TRUE,
+    ignoreInit = TRUE
+  )
+
+  ### Reset answers on new problem ----
+  observeEvent(
+    eventExpr = input$newWeather,
+    handlerExpr = {
+      updateNumericInput(
+        session = session,
+        inputId = "tomorrowProb1",
+        value = NA
+      )
+      updateNumericInput(
+        session = session,
+        inputId = "weekProb1",
+        value = NA
+      )
+      updateNumericInput(
+        session = session,
+        inputId = "monthProb1",
+        value = NA
+      )
+      updateNumericInput(
+        session = session,
+        inputId = "yearProb1",
+        value = NA
+      )
+    }
+  )
+
+  ### Create data for plots ----
+  weatherData <- eventReactive(
+    eventExpr = c(input$newWeatherPlotSamples, weatherValues$probRain),
+    valueExpr = {
+      intData <- data.frame(
+        day = 0:365,
+        state = c(1, rep(0, 365))
+      )
+      for (i in 2:366) {
+        intData$state[i] <- sample(
+          x = c(1,2),
+          size = 1,
+          replace = TRUE,
+          prob = weatherValues$probMatrix[intData$state[i - 1], ]
+        )
+      }
+      intData$cRain <- cumsum(intData$state == 1)
+      intData$cRainProp <- intData$cRain / (intData$day + 1)
+      intData$cNoRainProp <- 1 - intData$cRainProp
+
+      intData
+    }
+  )
+
+  ### Display plots ----
+  output$weatherMonth <- renderPlot(
+    expr = {
+      ggplot(
+        data = weatherData()[1:31, ],
+        mapping = aes(x = day, y = state)
+      ) +
+        geom_point(size = 2) +
+        geom_path() +
+        theme_bw() +
+        xlab("Days in the future") +
+        ylab("State") +
+        scale_y_continuous(breaks = 1:2, labels = c("Rain", "No Rain")) +
+        ggtitle("States by Day (First Month)") +
+        theme(
+          text = element_text(size = 18)
+        ) +
+        scale_x_continuous(
+          limits = c(0, 30),
+          breaks = c(0, 1, 5, 10, 15, 20, 25, 30),
+          expand = expansion(mult = 0, add = 0.5)
+        )
+    },
+    alt = "This plot shows the weather for one month of samples drawn from
+           the chain in the problem."
+  )
+
+  output$weatherYear <- renderPlot(
+    expr = {
+      ggplot(
+        data = weatherData(),
+        mapping = aes(x = day)
+      ) +
+        geom_path(
+          mapping = aes(y = cRainProp, color = "Rain"),
+          size = 1
+        ) +
+        geom_path(
+          mapping = aes(y = cNoRainProp, color = "No Rain"),
+          size = 1
+        ) +
+        geom_hline(
+          mapping = aes(
+            color = "Rain",
+            yintercept = calcAnswer(
+              pMatrix = weatherValues$probMatrix,
+              power = 365,
+              element = c(1, 1),
+              digits =  2
+            )
+          ),
+          linetype = "dashed",
+          size = 1,
+        ) +
+        geom_hline(
+          mapping = aes(
+            color = "No Rain",
+            yintercept = 1 - calcAnswer(
+              pMatrix = weatherValues$probMatrix,
+              power = 365,
+              element = c(1, 1),
+              digits =  2
+            )
+          ),
+          linetype = "dashed",
+          size = 1,
+        ) +
+        theme_bw() +
+        xlab("Days in the future") +
+        ylab("Cumulative proportion") +
+        ggtitle("Cumulative Proportion By Type of Day") +
+        scale_color_manual(
+          name = "Choice",
+          values = boastPalette
+        ) +
+        theme(
+          text = element_text(size = 18),
+          legend.position = "bottom"
+        ) +
+        scale_x_continuous(
+          limits = c(0, 365),
+          breaks = c(0, 50, 100, 150, 200, 250, 300, 350),
+          expand = expansion(mult = 0, add = 0.5)
+        )
+    },
+    alt = "This plot shows the cumulative proportion of days of each weather type
             for one simulated year. Over time, these proportions get closer to the 
-             long run proportions.`)})"
-      )))
-  })
-  
+             long run proportions."
+  )
+
+# OLD CODE BELOW ----
   ### Traffic lights context ----
   # Resets the probabilities of Green, Red, or Yellow lights
   # The double letter pair at the end of each name stands for the color to color
@@ -1262,7 +1751,7 @@ server <- function(input, output, session) {
   })
   
   # Update lights values for a new problem
-  observeEvent(input$newLights, {
+  observeEvent(input$newTraffic, {
     click("newLightPlotSamples")
     game$showFeedback <- F
     game$probSLYY <- round(runif(n = 1, min = .02, max = .08),2)
@@ -1381,7 +1870,7 @@ server <- function(input, output, session) {
   
   # Controls feedback display
   # Show feedback if the button is pressed; hide feedback if the answers change
-  observeEvent(input$checkGameLights, {game$showFeedback <- T})
+  observeEvent(input$checkTraffic, {game$showFeedback <- T})
   observeEvent(input$TLG1, {game$showFeedback <- F})
   observeEvent(input$TLR1, {game$showFeedback <- F})
   observeEvent(input$TLG5, {game$showFeedback <- F})
@@ -1389,7 +1878,7 @@ server <- function(input, output, session) {
   observeEvent(input$TLG9, {game$showFeedback <- F})
   observeEvent(input$TLR9, {game$showFeedback <- F})
   
-  observeEvent(input$pages, {click("newLights")})
+  observeEvent(input$pages, {click("newTraffic")})
   
   # Does a walk of length 10 using the probability matrix for lights problem
   lightSteps <- eventReactive(input$newLightPlotSamples, {
@@ -1463,7 +1952,7 @@ server <- function(input, output, session) {
   
   # Create plot of cumulative proportions spent in each state
   output$lightCumulativeProb <- renderPlot({
-    data <- pivot_longer(lightSteps(), cols = c("Red", "Yellow", "Green"), 
+    data <- tidyr::pivot_longer(lightSteps(), cols = c("Red", "Yellow", "Green"), 
                          names_to = "Color", values_to = "Proportion")
     data$Proportion <- data$Proportion / (data$day + 1)
     plot <- ggplot2::ggplot(aes(x = day, y = Proportion, color = Color), 
@@ -1520,208 +2009,6 @@ server <- function(input, output, session) {
       )))
   })
   
-  ### Candy (or cookies) context ----
-  # Assign probabilities to the candy/cookies problem
-  createCandy <- reactive({
-    game$probCandy <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
-    game$probCookie <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
-    game$correctMatC <- matrix(c(game$probCandy, 1 - game$probCandy, 
-                                 1 - game$probCookie, game$probCookie),
-                              nrow = 2, byrow = TRUE)
-  })
-  
-  # Set up text for the candy problem
-  output$candyProb <- renderText({
-  createCandy()
-  paste0("Mrs. Gamble's kindergarten class has 20 students. 
-    One day, she brings in a jar of cookies and a bag of candy and gives each 
-    student the choice between either candy or a cookie. Each student then 
-    sequentially chooses a treat. Without any influence from the other students, 
-    each student is equally likely to choose either option, but being 
-    impressionable young children, the choice of each student is impacted by the 
-    choice of the previous student. As such, if the previous student chose candy, 
-    then the next student will choose candy with probability ", game$probCandy, 
-    ", and if the previous student chose a cookie then the next student will 
-    choose a cookie with probability ", game$probCookie, ". Assuming that the 
-    first student chooses a cookie, calculate the following probabilities.")})
-
-  # Output check or X for first question (child 1)
-  output$correctnessChild1 <- renderUI(if (game$showFeedback) {
-    correctnessPic(!(is.na(input$child1Prob)) && 
-                     round(input$child1Prob,2) == round(game$correctMatC[2,1],2))})
-  
-  # Output check or X for second question (child 5)
-  output$correctnessChild5 <- renderUI(if (game$showFeedback) {
-    correctnessPic(!(is.na(input$child5Prob)) && 
-                     round(input$child5Prob, 2) == 
-                     round(gameAns(correctMat = game$correctMatC, 
-                                        start = 2, 
-                                        pow = 5), 2))})
-  
-  # Output check or X for third question (child 10)
-  output$correctnessChild10 <- renderUI(if (game$showFeedback) {
-    correctnessPic(!(is.na(input$child10Prob)) && 
-                     round(input$child10Prob, 2) == 
-                     round(gameAns(correctMat = game$correctMatC, 
-                                        start = 2, 
-                                        pow = 10), 2))})
-  
-  # Output check or X for fourth question (child 20)
-  output$correctnessChild20 <- renderUI(if (game$showFeedback) {
-    correctnessPic(!(is.na(input$child20Prob)) && 
-                     round(input$child20Prob, 2) == 
-                     round(gameAns(correctMat = game$correctMatC, 
-                                        start = 2, 
-                                        pow = 20), 2))})
-  
-  # Control when feedback is displayed (only directly after pressing the button)
-  observeEvent(input$checkCandy, {game$showFeedback <- T})
-  observeEvent(input$child1Prob, {game$showFeedback <- F})
-  observeEvent(input$child5Prob, {game$showFeedback <- F})
-  observeEvent(input$child10Prob, {game$showFeedback <- F})
-  observeEvent(input$child20Prob, {game$showFeedback <- F})
-  observeEvent(input$problems, {game$showFeedback <- F})
-
-  
-  # When tabs switch, make sure feedback goes away and candy problem is updated
-  observeEvent(input$pages, {
-    game$showFeedback <- F
-    click("newCandy") # Mostly to make sure that the initial problem renders
-  })
-  
-  # When a new problem is requested, update numbers and plots
-  observeEvent(input$newCandy, {
-    click("newCandyPlotSamples")
-    game$showFeedback <- F
-    game$probCandy <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
-    game$probCookie <- sample(c(.6, .7, .8, .9), size = 1, replace = T)
-    game$correctMatC <- matrix(c(game$probCandy, 1 - game$probCandy, 
-                                 1 - game$probCookie, game$probCookie),
-                               nrow = 2, byrow = TRUE)
-    
-    # Clear inputs when generating a new problem
-    updateNumericInput(
-      session = session,
-      inputId = "child1Prob",
-      value = NA
-    )
-    updateNumericInput(
-      session = session,
-      inputId = "child5Prob",
-      value = NA
-    )
-    updateNumericInput(
-      session = session,
-      inputId = "child10Prob",
-      value = NA
-    )
-    updateNumericInput(
-      session = session,
-      inputId = "child20Prob",
-      value = NA
-    )
-    })
-  
-  # Assigns all students a cookie or candy choice based on current probabilities
-  candySteps <- eventReactive(input$newCandyPlotSamples, {
-    curState <- 0
-    index <- 1:20
-    states <- c(1)
-    cookieSum <- c(1)
-    # Loop through all remaining students
-    for (x in 2:20) {
-      curState <- sample(c(0,1), 1, replace = TRUE, 
-                         prob = game$correctMatC[curState + 1,])
-      states <- c(states, curState)
-      cookieSum <- c(cookieSum, cookieSum[x - 1] + curState)
-    }
-    
-    # Return data frame of data generated by the simulation
-    data.frame(day = index, 
-               state = states,
-               Cookie = cookieSum/(index), 
-               Candy = 1 - cookieSum/(index))
-  })
-  
-  # Plots the choices of each of the children
-  output$candyDaily <- renderPlot({
-    plot <- ggplot2::ggplot(aes(x = day, y = state), data = candySteps()) +
-      geom_point(size = 2) +
-      geom_path() +
-      xlab("Student") +
-      ylab('State') +
-      scale_y_continuous(breaks = 0:1, labels = c("Candy", "Cookie")) +
-      ggtitle("Children's Choices") +
-      theme(axis.text = element_text(size = 18),
-            plot.title = element_text(size = 18, face = "bold"),
-            axis.title = element_text(size = 18),
-            panel.background = element_rect(fill = "white", color = "black"),
-            legend.position = c(.89,1.07),
-            legend.text = element_text(size = 14),
-            legend.title = element_text(size = 16)
-      )
-    plot
-  })
-  
-  # Alt-text
-  output$candyDailyAlt <- renderUI({
-    tags$script(HTML(
-      paste0("$(document).ready(function() {
-            document.getElementById('candyDaily').setAttribute('aria-label',
-            `This plot shows the choice of each student for one simulation of 
-             the process.`)})"
-      )))
-  })
-  
-  #### Plots ----
-  # Plots the cumulative proportion of candy and cookie chosen
-  output$candyCumulativeProb <- renderPlot({
-    data <- pivot_longer(candySteps(), 
-                         cols = c("Candy", "Cookie"), 
-                         names_to = "Choice", 
-                         values_to = "Proportion")
-    plot <- ggplot2::ggplot(aes(x = day, y = Proportion, color = Choice), 
-                          data = data) +
-      geom_hline(aes(yintercept = gameAns(correctMat = game$correctMatC, 
-                                          start = 1, 
-                                          pow = 365)), 
-                 color = boastPalette[1], 
-                 linetype = "dashed", 
-                 lwd = 1, 
-                 show.legend = TRUE) +
-      geom_hline(aes(yintercept = 1 - gameAns(correctMat = game$correctMatC, 
-                                              start = 1, 
-                                              pow = 365)), 
-                 color = boastPalette[2], 
-                 linetype = "dashed", 
-                 lwd = 1, 
-                 show.legend = TRUE) +
-      scale_colour_manual(values = boastUtils::boastPalette) +
-      geom_path(lwd = 1) +
-      xlab("Student") +
-      ylab('Cumulative portion by choice') +
-      ggtitle("Portion Student Choices") +
-      theme(axis.text = element_text(size = 18),
-            plot.title = element_text(size = 18, face = "bold"),
-            axis.title = element_text(size = 18),
-            panel.background = element_rect(fill = "white", color = "black"),
-            legend.text = element_text(size = 14),
-            legend.title = element_text(size = 16),
-            legend.position = "bottom"
-      )
-    plot
-  })
-  
-  # Alt-text
-  output$candyCumulativeAlt <- renderUI({
-    tags$script(HTML(
-      paste0("$(document).ready(function() {
-            document.getElementById('candyCumulativeProb').setAttribute('aria-label',
-            `This plot shows the cumulative proportion of each student's choice 
-            for one simulation. Over time, these proportions get closer to the 
-             long run proportions.`)})"
-      )))
-  })
 }
   
 
