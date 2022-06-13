@@ -2,42 +2,23 @@
 library(shiny)
 library(shinydashboard)
 library(shinyBS)
-library(boastUtils)
 library(shinyWidgets)
+library(boastUtils)
 library(shinyMatrix)
-library(shinyjs)
 library(ggplot2)
-library(tidyr)
 library(matrixcalc)
 library(DT)
 
-## Global functions ----
+# Global functions ----
+## Raise a probability matrix to a given power and return a specific element
 calcAnswer <- function(pMatrix, power, element, digits = 2){
   raisedMat <- matrixcalc::matrix.power(x = pMatrix, k = power)
   targetValue <- raisedMat[element[1], element[2]]
   return(round(targetValue, digits = digits))
 }
 
-gameAns <- function(correctMat, start, pow, col = 1){
-  matrixcalc::matrix.power(correctMat, pow)[start, col]
-}
-
-
-# Function for showing the check or X based on a condition
-# Input: boolean for whether the condition is true or false
-# Output: appropriate image
-correctnessPic <- function(condition){
-  if (condition) {
-    renderIcon(icon = "correct", html = TRUE)
-  }
-  else{
-    renderIcon(icon = "incorrect", html = TRUE)
-  }
-}
-
 # Define UI for App ----
 ui <- list(
-  useShinyjs(),
   dashboardPage(
     skin = "blue",
     ## Header ----
@@ -107,7 +88,7 @@ ui <- list(
           br(), 
           h2("Acknowledgements"), 
           p("This app was developed and coded by Leah Hunt in 2020 and updated
-            in 2021 by Shravani Samala",
+            in 2021 by Shravani Samala.",
             br(),
             br(),
             "Cite this app as:",
@@ -115,7 +96,7 @@ ui <- list(
             citeApp(),
             br(),
             br(),
-            div(class = "updated",  "Last Update: 6/7/2022 by NJH.")
+            div(class = "updated",  "Last Update: 6/13/2022 by NJH.")
           )
         ), 
         ### Prerequisites Page ----
@@ -470,6 +451,8 @@ ui <- list(
                   cols = list(names = TRUE, editableNames = TRUE),
                   class = "numeric"
                 ),
+                p("You can click on the row and column headers to type in your
+                  own names."),
                 # Input for number of steps to take
                 numericInput(
                   inputId = "steps", 
@@ -625,7 +608,7 @@ ui <- list(
               title = "Traffic Lights",
               br(),
               h2("Traffic Lights"),
-              textOutput("lightProb"),
+              uiOutput("trafficProb"),
               br(),
               fluidRow(
                 column(
@@ -753,18 +736,14 @@ ui <- list(
               ),
               checkboxInput(
                 inputId = "showTrafficPLots", 
-                label = "Show plots for light sample paths"
+                label = "Show plots for traffic light sample paths"
               ),
-              ##### Improvement here ----
-              ## Update the alt text to new approaches
               conditionalPanel( 
                 condition = "input.showTrafficPLots",
-                plotOutput("lightDaily", height = '250px'),
-                htmlOutput("lightDailyAlt"),
-                plotOutput("lightCumulativeProb", height = '300px'),
-                htmlOutput("lightCumulativeAlt"),
+                plotOutput(outputId = "trafficJourney", height = "250px"),
+                plotOutput(outputId = "trafficCumulative", height = "300px"),
                 bsButton(
-                  inputId = "newLightPlotSamples", 
+                  inputId = "newTrafficPlotSamples", 
                   label = "New Sample Path",
                   size = "large",
                   icon = icon("retweet")
@@ -899,63 +878,59 @@ ui <- list(
           tabName = "references",
           withMathJax(),
           h2("References"),
-          #### Update after rest of improvements ----
-          p(
-            class = "hangingindent", 
-            "Attali, D. (2020), shinyjs: Easily Improve the User Experience of 
-            Your Shiny Apps in Seconds, R package. Available from  
-            https://CRAN.R-project.org/package=shinyjs"
-          ), 
           p(
             class = "hangingindent",
-            "Bailey, E. (2015), shinyBS: Twitter bootstrap components for shiny, 
-            R package. Available from https://CRAN.R-project.org/package=shinyBS"
+            "Bailey, E. (2022). shinyBS: Twitter bootstrap components for shiny.
+            (v 0.61.1). [R package]. Available from 
+            https://CRAN.R-project.org/package=shinyBS"
           ),
           p(
             class = "hangingindent",
-            "Carey, R. (2019), boastUtils: BOAST Utilities. Available from
+            "Carey, R. and Hatfield, N. J. (2022). boastUtils: BOAST Utilities.
+            (v 0.1.12.3). [R package]. Available from
             https://github.com/EducationShinyAppTeam/boastUtils"
           ),
           p(
             class = "hangingindent",
-            "Chang, W. and Borges Ribeio, B. (2018), shinydashboard: Create
-            dashboards with 'Shiny', R package. Available from
+            "Chang, W. and Borges Ribeio, B. (2021). shinydashboard: Create
+            dashboards with 'Shiny'. (v. 0.7.2). [R package]. Available from
             https://CRAN.R-project.org/package=shinydashboard"
           ),
           p(
             class = "hangingindent",
-            "Chang, W., Cheng, J., Allaire, J., Xie, Y., and McPherson, J.
-            (2019), shiny: Web application framework for R, R package. Available 
-            from https://CRAN.R-project.org/package=shiny"
+            "Chang, W., Cheng, J., Allaire, J., Sievert, C., Schloerke, B., Xie, Y.,
+            Allen, J., McPherson, J., Dipert, A., and Borges, B. (2021). shiny: 
+            Web application framework for R, R package. (v 1.7.1). [R package]. 
+            Available from https://CRAN.R-project.org/package=shiny"
           ),
           p(
             class = "hangingindent", 
-            "Neudecker, A. (2019), shinyMatrix: Shiny Matrix Input Field, R 
-            package, R package. Available from 
-            https://CRAN.R-project.org/package=shinyMatrix"
+            "Neudecker, A. (2021), shinyMatrix: Shiny matrix input field. (v 0.6.0).
+            [R package]. Available from https://CRAN.R-project.org/package=shinyMatrix"
           ), 
           p(
             class = "hangingindent",
-            "Novomestky, F. (2012), matrixcalc: Collection of functions for 
-            matrix calculations., R package. Available from
+            "Novomestky, F. (2021, matrixcalc: Collection of functions for 
+            matrix calculations. (v 1.0-5). [R package]. Available from
             https://CRAN.R-project.org/package=matrixcalc"
           ),
           p(
             class = "hangingindent",
-            "Perrier, V., Meyer, F., and Granjon, D. (2020), shinyWidgets: Custom 
-            Inputs Widgets for Shiny, R package. Available from
+            "Perrier, V., Meyer, F., and Granjon, D. (2022), shinyWidgets: Custom 
+            Inputs Widgets for Shiny. (v 0.7.0). [R package]. Available from
             https://CRAN.R-project.org/package=shinyWidgets"
           ),
           p(
             class = "hangingindent",
-            "Wickham, H. and Lionel, H. (2020), tidyr: Tidy Messy Data, R package.
-            Available from https://CRAN.R-project.org/package=tidyr"
-            ),
+            "Wickham, W. (2016), ggplot2: Elegant graphics for data analysis,
+            R Package. Springer-Verlag New York. (v 3.3.6). [R package].
+            Available from https://ggplot2.tidyverse.org"
+          ),
           p(
             class = "hangingindent",
-            "Wickham, W. (2016), ggplot2: Elegant graphics for data analysis,
-            R Package. Springer-Verlag New York. Available from
-            https://ggplot2.tidyverse.org"
+            "Xie, Y., Cheng, J., and Tan, X. (2022). DT: A wrapper of the
+            JavaScript library 'DataTables'. (v 0.23). [R package]. Available 
+            from https://CRAN.R-project.org/package=DT"
           ),
           br(),
           br(),
@@ -1139,7 +1114,7 @@ server <- function(input, output, session) {
   candyValues <- reactiveValues(
     probCandy = 5, # Prob(Candy|Cookie)
     probCookie = 5, # Prob(Cookie|Cookie)
-    probMatrix = diag(1),
+    probMatrix = diag(2),
     validAnswers = FALSE
   )
   
@@ -1434,6 +1409,375 @@ server <- function(input, output, session) {
   )
   
   ## Traffic Scenario ----
+  ### Generate initial values ----
+  trafficValues <- reactiveValues(
+    probG2G = 5,
+    probG2Y = 5,
+    probG2R = 5,
+    probY2G = 5,
+    probY2Y = 5,
+    probY2R = 5,
+    probR2G = 5,
+    probR2Y = 5,
+    probR2R = 5,
+    probMatrix = diag(3),
+    validAnswers = FALSE
+  )
+
+  observeEvent(
+    eventExpr = input$newTraffic,
+    handlerExpr = {
+      trafficValues$probG2G <- round(x = runif(n = 1, min = 0.5, max = 0.8), digits = 2)
+      trafficValues$probG2Y <- round(x = runif(n = 1, min = 0.02, max = 0.08), digits = 2)
+      trafficValues$probG2R <- 1 - (trafficValues$probG2G + trafficValues$probG2Y)
+      trafficValues$probY2G <- round(x = runif(n = 1, min = 0.2, max = 0.7), digits = 2)
+      trafficValues$probY2Y <- round(x = runif(n = 1, min = 0.02, max = 0.08), digits = 2)
+      trafficValues$probY2R <- 1 - (trafficValues$probY2G + trafficValues$probY2Y)
+      trafficValues$probR2G <- round(x = runif(n = 1, min = 0.2, max = 0.7), digits = 2)
+      trafficValues$probR2Y <- round(x = runif(n = 1, min = 0.02, max = 0.08), digits = 2)
+      trafficValues$probR2R <- 1 - (trafficValues$probR2G + trafficValues$probR2Y)
+      trafficValues$probMatrix <- matrix(
+        data = c(trafficValues$probG2G, trafficValues$probG2Y, trafficValues$probG2R,
+                 trafficValues$probY2G, trafficValues$probY2Y, trafficValues$probY2R,
+                 trafficValues$probR2G, trafficValues$probR2Y, trafficValues$probR2R),
+        nrow = 3,
+        byrow = TRUE
+      )
+    },
+    ignoreNULL = FALSE,
+    ignoreInit = FALSE
+  )
+
+  ### Display scenario text ----
+  # Set up text for the traffic problem
+  output$trafficProb <- renderUI(
+    expr = {
+      div(
+        p(paste0("Sarah is driving down a road with 10 traffic lights. These 
+                 lights are timed such that if the current light is green, the
+                 probability of the next light being green is ", trafficValues$probG2G, 
+                 " while the probability of it being red is ", trafficValues$probG2R,
+                 " with the remainin probability on encountering a yellow. If the
+                 current light is yellow, then the probability of the next light
+                 being green is ", trafficValues$probY2G, " and the probability 
+                 of the next light being red is ", trafficValues$probY2R,". Lastly,
+                 if the current light is red, then the probability of the next
+                 light being green is ", trafficValues$probR2G, " while the 
+                 probability of it being red is ", trafficValues$probR2R, ".")),
+        p("Suppose the first light Sarah encounters is green; calculate the
+          following probabilities.")
+      )
+    }
+  )
+
+  # ### Check answers ----
+  observeEvent(
+    eventExpr = input$checkTraffic,
+    handlerExpr = {
+      if (any(is.na(input$TLG1), is.na(input$TLR1), is.na(input$TLG5),
+              is.na(input$TLR5), is.na(input$TLG9), is.na(input$TLR9))) {
+        sendSweetAlert(
+          session = session,
+          title = "Missing Values",
+          type = "warning",
+          text = "You have one or more answers missing. Please answer all questions
+          before checking all answers."
+        )
+        trafficValues$validAnswers <- FALSE
+      } else if (any(input$TLG1 < 0, input$TLR1 < 0, input$TLG5 < 0,
+                     input$TLR5 < 0, input$TLG9 < 0, input$TLR9 < 0)) {
+        sendSweetAlert(
+          session = session,
+          title = "Negative Probabilities",
+          type = "error",
+          text = "At least one of your answers is a negative value. Please check
+          your answers and fix accordingly."
+        )
+        trafficValues$validAnswers <- FALSE
+      } else if (any(input$TLG1 > 1, input$TLR1 > 1, input$TLG5 > 1,
+                     input$TLR5 > 1, input$TLG9 > 1, input$TLR9 > 1)) {
+        sendSweetAlert(
+          session = session,
+          title = "Probabilities Greater Than 1",
+          type = "error",
+          text = "At least one of your answers a values greater than 1. Please check
+          your answers and fix accordingly."
+        )
+        trafficValues$validAnswers <- FALSE
+      } else {
+        trafficValues$validAnswers <- TRUE
+        output$correctnessLG1 <- renderIcon(
+          icon = ifelse(
+            test = round(input$TLG1, digits = 2) == calcAnswer(
+              pMatrix = trafficValues$probMatrix,
+              power = 1,
+              element = c(1,1),
+              digits = 2
+            ),
+            yes = "correct",
+            no = "incorrect"
+          ),
+          width = 48
+        )
+        output$correctnessLR1 <- renderIcon(
+          icon = ifelse(
+            test = round(input$TLR1, digits = 2) == calcAnswer(
+              pMatrix = trafficValues$probMatrix,
+              power = 1,
+              element = c(1,3),
+              digits = 2
+            ),
+            yes = "correct",
+            no = "incorrect"
+          ),
+          width = 48
+        )
+        output$correctnessLG5 <- renderIcon(
+          icon = ifelse(
+            test = round(input$TLG5, digits = 2) == calcAnswer(
+              pMatrix = trafficValues$probMatrix,
+              power = 5,
+              element = c(1,1),
+              digits = 2
+            ),
+            yes = "correct",
+            no = "incorrect"
+          ),
+          width = 48
+        )
+        output$correctnessLR5 <- renderIcon(
+          icon = ifelse(
+            test = round(input$TLR5, digits = 2) == calcAnswer(
+              pMatrix = trafficValues$probMatrix,
+              power = 5,
+              element = c(1,3),
+              digits = 2
+            ),
+            yes = "correct",
+            no = "incorrect"
+          ),
+          width = 48
+        )
+        output$correctnessLG9 <- renderIcon(
+          icon = ifelse(
+            test = round(input$TLG9, digits = 2) == calcAnswer(
+              pMatrix = trafficValues$probMatrix,
+              power = 9,
+              element = c(1,1),
+              digits = 2
+            ),
+            yes = "correct",
+            no = "incorrect"
+          ),
+          width = 48
+        )
+        output$correctnessLR9 <- renderIcon(
+          icon = ifelse(
+            test = round(input$TLR9, digits = 2) == calcAnswer(
+              pMatrix = trafficValues$probMatrix,
+              power = 9,
+              element = c(1,3),
+              digits = 2
+            ),
+            yes = "correct",
+            no = "incorrect"
+          ),
+          width = 48
+        )
+      }
+    },
+    ignoreNULL = TRUE,
+    ignoreInit = FALSE
+  )
+
+  ### Hide answers when inputs change ----
+  observeEvent(
+    eventExpr = c(input$TLG1, input$TLR1, input$TLG5, input$TLR5, input$TLG9,
+                  input$TLR9),
+    handlerExpr = {
+      if (trafficValues$validAnswers) {
+        output$correctnessLG1 <- renderIcon()
+        output$correctnessLR1 <- renderIcon()
+        output$correctnessLG5 <- renderIcon()
+        output$correctnessLR5 <- renderIcon()
+        output$correctnessLG9 <- renderIcon()
+        output$correctnessLR9 <- renderIcon()
+      }
+    },
+    ignoreNULL = TRUE,
+    ignoreInit = TRUE
+  )
+
+  ### Reset answers on new problem ----
+  observeEvent(
+    eventExpr = input$newTraffic,
+    handlerExpr = {
+      updateNumericInput(
+        session = session,
+        inputId = "TLG1",
+        value = NA
+      )
+      updateNumericInput(
+        session = session,
+        inputId = "TLR1",
+        value = NA
+      )
+      updateNumericInput(
+        session = session,
+        inputId = "TLG5",
+        value = NA
+      )
+      updateNumericInput(
+        session = session,
+        inputId = "TLR5",
+        value = NA
+      )
+      updateNumericInput(
+        session = session,
+        inputId = "TLG9",
+        value = NA
+      )
+      updateNumericInput(
+        session = session,
+        inputId = "TLR9",
+        value = NA
+      )
+    }
+  )
+
+  ### Create data for plots ----
+  trafficData <- eventReactive(
+    eventExpr = c(input$newTrafficPlotSamples, trafficValues$probG2G,
+                  trafficValues$probY2Y, trafficValues$probR2R),
+    valueExpr = {
+      intData <- data.frame(
+        light = 1:10,
+        state = c(1, rep(0, 9))
+      )
+      for (i in 2:10) {
+        intData$state[i] <- sample(
+          x = c(1, 2, 3),
+          size = 1,
+          replace = TRUE,
+          prob = trafficValues$probMatrix[intData$state[i - 1], ]
+        )
+      }
+      intData$cGreen <- cumsum(intData$state == 1)
+      intData$cYellow <- cumsum(intData$state == 2)
+      intData$cGreenProp <- intData$cGreen / intData$light
+      intData$cYellowProp <- intData$cYellow / intData$light
+      intData$cRedProp <- 1 - (intData$cGreenProp + intData$cYellowProp)
+
+      intData
+    }
+  )
+
+  ### Display plots ----
+  output$trafficJourney <- renderPlot(
+    expr = {
+      ggplot(
+        data = trafficData(),
+        mapping = aes(x = light, y = state)
+      ) +
+        geom_point(size = 2) +
+        geom_path() +
+        theme_bw() +
+        xlab("Traffic light") +
+        ylab("State") +
+        scale_y_continuous(breaks = 1:3, labels = c("Green", "Yellow", "Red")) +
+        ggtitle("States by Light") +
+        theme(
+          text = element_text(size = 18)
+        ) +
+        scale_x_continuous(
+          limits = c(1, 10),
+          breaks = 1:10,
+          expand = expansion(mult = 0, add = 0.1)
+        )
+    },
+    alt = "This plot shows the color of each light for one simulation of 
+          the process."
+  )
+
+  output$trafficCumulative <- renderPlot(
+    expr = {
+      ggplot(
+        data = trafficData(),
+        mapping = aes(x = light)
+      ) +
+        geom_path(
+          mapping = aes(y = cGreenProp, color = "Green"),
+          size = 1
+        ) +
+        geom_path(
+          mapping = aes(y = cYellowProp, color = "Yellow"),
+          size = 1
+        ) +
+        geom_path(
+          mapping = aes(y = cRedProp, color = "Red"),
+          size = 1
+        ) + 
+        geom_hline(
+          mapping = aes(
+            color = "Green",
+            yintercept = calcAnswer(
+              pMatrix = trafficValues$probMatrix,
+              power = 100,
+              element = c(1, 1),
+              digits =  2
+            )
+          ),
+          linetype = "dashed",
+          size = 1,
+        ) +
+        geom_hline(
+          mapping = aes(
+            color = "Yellow",
+            yintercept = calcAnswer(
+              pMatrix = trafficValues$probMatrix,
+              power = 100,
+              element = c(1, 2),
+              digits =  2
+            )
+          ),
+          linetype = "dashed",
+          size = 1,
+        ) +
+        geom_hline(
+          mapping = aes(
+            color = "Red",
+            yintercept = calcAnswer(
+              pMatrix = trafficValues$probMatrix,
+              power = 100,
+              element = c(1, 3),
+              digits =  2
+            )
+          ),
+          linetype = "dashed",
+          size = 1,
+        ) +
+        theme_bw() +
+        xlab("Traffic light") +
+        ylab("Cumulative proportion") +
+        ggtitle("Cumulative Proportion By Color of Traffic Light") +
+        scale_color_manual(
+          name = "Light color",
+          values = c("Green" = "#009E73", "Yellow" = "#E69F00", "Red" = "red")
+        ) +
+        theme(
+          text = element_text(size = 18),
+          legend.position = "bottom"
+        ) +
+        scale_x_continuous(
+          limits = c(1, 10),
+          breaks = 1:10,
+          expand = expansion(mult = 0, add = 0.1)
+        )
+    },
+    alt = "This plot shows the cumulative proportion of lights of each color 
+            for one simulation. Over time, these proportions get closer to the 
+             long run proportions."
+  )
 
   
   ## Weather Scenario ----
@@ -1441,7 +1785,7 @@ server <- function(input, output, session) {
   weatherValues <- reactiveValues(
     probRain = 5, # Prob(Rain|Rain)
     probNoRain = 5, # Prob(Rain|No rain)
-    probMatrix = diag(1),
+    probMatrix = diag(2),
     validAnswers = FALSE
   )
 
@@ -1462,7 +1806,7 @@ server <- function(input, output, session) {
   )
 
   ### Display scenario text ----
-  # Set up text for the candy problem
+  # Set up text for the weather problem
   output$weatherProb <- renderUI(
     expr = {
       div(
@@ -1728,286 +2072,6 @@ server <- function(input, output, session) {
             for one simulated year. Over time, these proportions get closer to the 
              long run proportions."
   )
-
-# OLD CODE BELOW ----
-  ### Traffic lights context ----
-  # Resets the probabilities of Green, Red, or Yellow lights
-  # The double letter pair at the end of each name stands for the color to color
-  # Ex. YG means the probability of transitioning from a yellow to a green light
-  createProbs <- reactive({
-    game$probSLYY <- round(runif(n = 1, min = .02, max = .08),2)
-    game$probSLYG <- round(runif(n = 1, min = .2, max = .7), 2)
-    game$probSLYR <- 1 - game$probSLYY - game$probSLYG
-    game$probSLRY <- round(runif(n = 1, min = .02, max = .08),2)
-    game$probSLRG <- round(runif(n = 1, min = .2, max = .7), 2)
-    game$probSLRR <- 1 - game$probSLRY - game$probSLRG
-    game$probSLGY <- round(runif(n = 1, min = .02, max = .08),2)
-    game$probSLGG <- round(runif(n = 1, min = .5, max = .8), 2)
-    game$probSLGR <- 1 - game$probSLGY - game$probSLGG
-    game$correctMatSL <- matrix(c(game$probSLGG, game$probSLGY, game$probSLGR, 
-                             game$probSLYG, game$probSLYY, game$probSLYR,
-                             game$probSLRG, game$probSLRY, game$probSLRR), 
-                             nrow = 3, byrow = T)
-  })
-  
-  # Update lights values for a new problem
-  observeEvent(input$newTraffic, {
-    click("newLightPlotSamples")
-    game$showFeedback <- F
-    game$probSLYY <- round(runif(n = 1, min = .02, max = .08),2)
-    game$probSLYG <- round(runif(n = 1, min = .2, max = .7), 2)
-    game$probSLYR <- 1 - game$probSLYY - game$probSLYG
-    game$probSLRY <- round(runif(n = 1, min = .02, max = .08),2)
-    game$probSLRG <- round(runif(n = 1, min = .2, max = .7), 2)
-    game$probSLRR <- 1 - game$probSLRY - game$probSLRG
-    game$probSLGY <- round(runif(n = 1, min = .02, max = .08),2)
-    game$probSLGG <- round(runif(n = 1, min = .5, max = .8), 2)
-    game$probSLGR <- 1 - game$probSLGY - game$probSLGG
-    game$correctMatSL <- matrix(c(game$probSLGG, game$probSLGY, game$probSLGR, 
-                                  game$probSLYG, game$probSLYY, game$probSLYR,
-                                  game$probSLRG, game$probSLRY, game$probSLRR), 
-                                nrow = 3, byrow = T)
-    # Clear inputs when generating a new problem
-    updateNumericInput(
-      session = session,
-      inputId = "TLG1",
-      value = NA
-    )
-    updateNumericInput(
-      session = session,
-      inputId = "TLR1",
-      value = NA
-    )
-    updateNumericInput(
-      session = session,
-      inputId = "TLG5",
-      value = NA
-    )
-    updateNumericInput(
-      session = session,
-      inputId = "TLR5",
-      value = NA
-    )
-    updateNumericInput(
-      session = session,
-      inputId = "TLG9",
-      value = NA
-    )
-    updateNumericInput(
-      session = session,
-      inputId = "TLR9",
-      value = NA
-    )
-    })
-
-  # Text for the traffic lights problem
-  output$lightProb <- renderText({
-    createProbs()
-  paste0("Sarah is driving down a road with 10 traffic lights.
-    These lights are timed such that if the current light is green, the probability 
-    of the next light being green is ", game$probSLGG, " while the probability of 
-    it being red is ", game$probSLGR, " with the remaining probability on yellow. 
-    If the current light is yellow, then the probability of the next light being 
-        green is ", game$probSLYG, " and the probability of the next light being 
-        red is ", game$probSLYR, ". Lastly, if the current light is red, then the 
-        probability of the next light being green is ", game$probSLRG, " while 
-        the probability of it being red is ", game$probSLRR, ". Suppose the first 
-        light is green; calculate the below probabilities for some of the 
-         following lights." 
-    )
-  })
-  
-  # Check or X for probability that the first light is green
-  output$correctnessLG1 <- renderUI(if (game$showFeedback) {
-    correctnessPic(!(is.na(input$TLG1)) && 
-                     round(input$TLG1, 2) == 
-                     round(gameAns(correctMat = game$correctMatSL, 
-                                   start = 1, 
-                                   pow = 1), 2))})
-  
-  # Check or X for probability that the first light is red
-  output$correctnessLR1 <- renderUI(if (game$showFeedback) {
-    correctnessPic(!(is.na(input$TLR1)) && 
-                     round(input$TLR1, 2) == 
-                     round(gameAns(correctMat = game$correctMatSL, 
-                                   start = 1, 
-                                   pow = 1, 
-                                   col = 3), 2))})
-  
-  # Check or X for probability that the fifth light is green
-  output$correctnessLG5 <- renderUI(if (game$showFeedback) {
-    correctnessPic(!(is.na(input$TLG5)) && 
-                     round(input$TLG5, 2) == 
-                     round(gameAns(correctMat = game$correctMatSL, 
-                                   start = 1, 
-                                   pow = 5), 2))})
-
-  # Check or X for probability that the fifth light is red
-  output$correctnessLR5 <- renderUI(if (game$showFeedback) {
-    correctnessPic(!(is.na(input$TLR5)) && 
-                     round(input$TLR5, 2) == 
-                     round(gameAns(correctMat = game$correctMatSL, 
-                                   start = 1, 
-                                   pow = 5, 
-                                   col = 3), 2))})
-  
-  # Check or X for probability that the last light is green
-  output$correctnessLG9 <- renderUI(if (game$showFeedback) {
-    correctnessPic(!(is.na(input$TLG9)) && 
-                     round(input$TLG9, 2) == 
-                     round(gameAns(correctMat = game$correctMatSL, 
-                                   start = 1, 
-                                   pow = 9), 2))})
-  
-  # Check or X for probability that the last light is red
-  output$correctnessLR9 <- renderUI(if (game$showFeedback) {
-    correctnessPic(!(is.na(input$TLR9)) && 
-                     round(input$TLR9, 2) == 
-                     round(gameAns(correctMat = game$correctMatSL, 
-                                   start = 1, 
-                                   pow = 9, 
-                                   col = 3), 2))})
-  
-  # Controls feedback display
-  # Show feedback if the button is pressed; hide feedback if the answers change
-  observeEvent(input$checkTraffic, {game$showFeedback <- T})
-  observeEvent(input$TLG1, {game$showFeedback <- F})
-  observeEvent(input$TLR1, {game$showFeedback <- F})
-  observeEvent(input$TLG5, {game$showFeedback <- F})
-  observeEvent(input$TLR5, {game$showFeedback <- F})
-  observeEvent(input$TLG9, {game$showFeedback <- F})
-  observeEvent(input$TLR9, {game$showFeedback <- F})
-  
-  observeEvent(input$pages, {click("newTraffic")})
-  
-  # Does a walk of length 10 using the probability matrix for lights problem
-  lightSteps <- eventReactive(input$newLightPlotSamples, {
-    curState <- 0
-    index <- 0:10
-    states <- c(0)
-    Green <- 1
-    Yellow <- 0
-    Red <- 0
-    greens <- c(1)
-    reds <- c(0)
-    yellows <- c(0)
-    
-    # For each light, sample the outcome based on the previous light
-    for (x in 1:10) {
-      curState <- sample(c(0,1,2), 1, 
-                         replace = TRUE, 
-                         prob = game$correctMatSL[curState + 1,])
-      states <- c(states, curState)
-      if (curState == 0) {
-        Green <- Green + 1
-      }
-      else if (curState == 1) {
-        Yellow <- Yellow + 1
-      }
-      else {
-        Red <- Red + 1
-      }
-      reds <- c(reds, Red)
-      greens <- c(greens, Green)
-      yellows <- c(yellows, Yellow)
-    }
-    
-    # Return data frame of results
-    data.frame(day = index, 
-               state = states, 
-               Green = greens, 
-               Yellow = yellows, 
-               Red = reds)
-  })
-  #### Plots ----
-  # Create plot for all 10 lights by state
-  output$lightDaily <- renderPlot({
-    plot <- ggplot2::ggplot(aes(x = day, y = state), data = lightSteps()) +
-      geom_point(size = 2) +
-      geom_path() +
-      xlab("Light Number") + 
-      ylab('State') +
-      scale_y_continuous(breaks = 0:2, labels = c("Green", "Yellow", "Red")) +
-      ggtitle("States by Light Number") +
-      theme(axis.text = element_text(size = 18),
-            plot.title = element_text(size = 18, face = "bold"),
-            axis.title = element_text(size = 18),
-            panel.background = element_rect(fill = "white", color = "black"),
-            legend.position = c(.89,1.07),
-            legend.text = element_text(size = 14),
-            legend.title = element_text(size = 16)
-      )
-    plot
-  })
-  
-  # Alt-text
-  output$lightDailyAlt <- renderUI({
-    tags$script(HTML(
-      paste0("$(document).ready(function() {
-            document.getElementById('lightDaily').setAttribute('aria-label',
-            `This plot shows the color of each light for one simulation of 
-             the process.`)})"
-      )))
-  })
-  
-  # Create plot of cumulative proportions spent in each state
-  output$lightCumulativeProb <- renderPlot({
-    data <- tidyr::pivot_longer(lightSteps(), cols = c("Red", "Yellow", "Green"), 
-                         names_to = "Color", values_to = "Proportion")
-    data$Proportion <- data$Proportion / (data$day + 1)
-    plot <- ggplot2::ggplot(aes(x = day, y = Proportion, color = Color), 
-                          data = data) +
-      scale_colour_manual(values = c("#009E73", "red", "#E69F00")) +
-      geom_hline(aes(yintercept = gameAns(correctMat = game$correctMatSL, 
-                                          start = 1, 
-                                          pow = 100, 
-                                          col = 1)), 
-                 lwd = 1, 
-                 linetype = "dashed", 
-                 color = "#009E73", 
-                 show.legend = TRUE) +
-      geom_hline(aes(yintercept = gameAns(correctMat = game$correctMatSL, 
-                                          start = 1, 
-                                          pow = 100, 
-                                          col = 2)), 
-                 lwd = 1, 
-                 linetype = "dashed", 
-                 color = "#E69F00", 
-                 show.legend = TRUE) +
-      geom_hline(aes(yintercept = gameAns(correctMat = game$correctMatSL, 
-                                          start = 1, 
-                                          pow = 100, 
-                                          col = 3)), 
-                 lwd = 1, 
-                 linetype = "dashed", 
-                 color = "red", 
-                 show.legend = TRUE) +
-      geom_path(lwd = 1) +
-      geom_point(aes(shape = Color), size = 3) +
-      xlab("Light number") + 
-      ylab('Cumulative proportions') +
-      ggtitle("Portion of Light Colors Over Time") +
-      theme(axis.text = element_text(size = 18),
-            plot.title = element_text(size = 18, face = "bold"),
-            axis.title = element_text(size = 18),
-            panel.background = element_rect(fill = "white", color = "black"),
-            legend.text = element_text(size = 14),
-            legend.title = element_text(size = 16),
-            legend.position = "bottom"
-      )
-    plot
-  })
-  
-  # Alt-text
-  output$lightCumulativeAlt <- renderUI({
-    tags$script(HTML(
-      paste0("$(document).ready(function() {
-            document.getElementById('lightCumulativeProb').setAttribute('aria-label',
-            `This plot shows the cumulative proportion of lights of each color 
-            for one simulation. Over time, these proportions get closer to the 
-             long run proportions.`)})"
-      )))
-  })
   
 }
   
