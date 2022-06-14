@@ -11,7 +11,9 @@ Authors@R: c(
 Chapter: Stochastic Processes
 Description: This app explores discrete time Markov Chains and their long run behavior by considering multiple sample problems
 LearningObjectives: c(
-    "The student will learn about"
+    "The student will learn to explore Discrete Time Markov Chains.",
+    "The student will learn to explore the convergence of Discrete Time Markov Chains to a limiting distribution.",
+    "The student will learn to apply Discrete Time Markov Chains to solve problems."
   )
 DisplayMode: Normal
 URL: https://psu-eberly.shinyapps.io/Markov_Chain_Convergence

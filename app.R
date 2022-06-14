@@ -151,7 +151,6 @@ ui <- list(
                 br(), 
                 br(), 
                 br(), 
-                
                 p("\\(P=\\)"), 
               ), 
               column(
@@ -238,7 +237,6 @@ ui <- list(
                 br(), 
                 br(), 
                 br(), 
-                
                 p("\\(P^2=\\)"), 
               ), 
               column(
@@ -309,7 +307,6 @@ ui <- list(
                 br(), 
                 br(), 
                 br(), 
-                
                 p("\\(P^{365}=\\)"), 
               ), 
               column(
@@ -371,7 +368,6 @@ ui <- list(
             br(), 
             p("After so many days, the distribution no longer depends on what you
               ate so long ago "),
-            
           ), 
           box(
             width = 12, 
@@ -406,7 +402,7 @@ ui <- list(
               size = "large",
               icon = icon("bolt")
             )
-          ),
+          )
         ), 
         ### Explore Page ----
         tabItem(
@@ -466,7 +462,8 @@ ui <- list(
                   inputId = "subMat", 
                   label = "Calculate matrix",
                   size = "large",
-                  icon = icon("calculator"))
+                  icon = icon("calculator")
+                )
               )
             ),
             column(
@@ -945,22 +942,7 @@ ui <- list(
 
 # Define server logic ----
 server <- function(input, output, session) {
-  ## Set user specific elements ----
-  ### power matrix
-  calculatedMatrix <- reactiveVal(NULL)
-
-  ### All of the variables that will be tracked in the various scenarios
-  game <- reactiveValues(
-    score = 0, context = "", probw1 = 0, probw2 = 0, 
-    probSLRG = 0, probSLGY = 0, probSLGR = 0, probSLGG = 0,
-    probSLYY = 0, probSLYR = 0, probSLYG = 0,
-    probSLRY = 0, probSLRR = 0, probCandy = 0, 
-    probCookie = 0, inLab = "", correctMat = diag(2), 
-    correctMatSL = diag(3), correctMatC = diag(2),
-    showFeedback = FALSE
-  )
-  
-  ## info button ----
+  ## Info button ----
   observeEvent(
     eventExpr = input$info,
     handlerExpr = {
@@ -999,6 +981,9 @@ server <- function(input, output, session) {
     })
   
   ## Probability Matrix Calculator ----
+  ### Calculated matrix ---- 
+  calculatedMatrix <- reactiveVal(NULL)
+  
   ### Dynamically update the probability matrix size ----
   observeEvent(
     eventExpr = input$nStates,
@@ -1252,8 +1237,8 @@ server <- function(input, output, session) {
   
   ### Hide answers when inputs change ----
   observeEvent(
-    eventExpr = c(input$child1Prob, input$child5Prob,
-                  input$child10Prob, input$child20Prob),
+    eventExpr = c(input$child1Prob, input$child5Prob, input$child10Prob,
+                  input$child20Prob, input$newCandy),
     handlerExpr = {
       if (candyValues$validAnswers) {
         output$correctnessChild1 <- renderIcon()
@@ -1401,7 +1386,7 @@ server <- function(input, output, session) {
           breaks = c(1, 5, 10, 15, 20),
           expand = expansion(mult = 0, add = 0.5)
         )
-
+      
     },
     alt = "This plot shows the cumulative proportion of each student's choice
             for one simulation. Over time, these proportions get closer to the
@@ -1411,6 +1396,7 @@ server <- function(input, output, session) {
   ## Traffic Scenario ----
   ### Generate initial values ----
   trafficValues <- reactiveValues(
+    # Initial Color 2 Next Color
     probG2G = 5,
     probG2Y = 5,
     probG2R = 5,
@@ -1423,7 +1409,7 @@ server <- function(input, output, session) {
     probMatrix = diag(3),
     validAnswers = FALSE
   )
-
+  
   observeEvent(
     eventExpr = input$newTraffic,
     handlerExpr = {
@@ -1447,7 +1433,7 @@ server <- function(input, output, session) {
     ignoreNULL = FALSE,
     ignoreInit = FALSE
   )
-
+  
   ### Display scenario text ----
   # Set up text for the traffic problem
   output$trafficProb <- renderUI(
@@ -1469,7 +1455,7 @@ server <- function(input, output, session) {
       )
     }
   )
-
+  
   # ### Check answers ----
   observeEvent(
     eventExpr = input$checkTraffic,
@@ -1589,11 +1575,11 @@ server <- function(input, output, session) {
     ignoreNULL = TRUE,
     ignoreInit = FALSE
   )
-
+  
   ### Hide answers when inputs change ----
   observeEvent(
     eventExpr = c(input$TLG1, input$TLR1, input$TLG5, input$TLR5, input$TLG9,
-                  input$TLR9),
+                  input$TLR9, input$newTraffic),
     handlerExpr = {
       if (trafficValues$validAnswers) {
         output$correctnessLG1 <- renderIcon()
@@ -1607,7 +1593,7 @@ server <- function(input, output, session) {
     ignoreNULL = TRUE,
     ignoreInit = TRUE
   )
-
+  
   ### Reset answers on new problem ----
   observeEvent(
     eventExpr = input$newTraffic,
@@ -1644,7 +1630,7 @@ server <- function(input, output, session) {
       )
     }
   )
-
+  
   ### Create data for plots ----
   trafficData <- eventReactive(
     eventExpr = c(input$newTrafficPlotSamples, trafficValues$probG2G,
@@ -1667,11 +1653,11 @@ server <- function(input, output, session) {
       intData$cGreenProp <- intData$cGreen / intData$light
       intData$cYellowProp <- intData$cYellow / intData$light
       intData$cRedProp <- 1 - (intData$cGreenProp + intData$cYellowProp)
-
+      
       intData
     }
   )
-
+  
   ### Display plots ----
   output$trafficJourney <- renderPlot(
     expr = {
@@ -1698,7 +1684,7 @@ server <- function(input, output, session) {
     alt = "This plot shows the color of each light for one simulation of 
           the process."
   )
-
+  
   output$trafficCumulative <- renderPlot(
     expr = {
       ggplot(
@@ -1778,7 +1764,7 @@ server <- function(input, output, session) {
             for one simulation. Over time, these proportions get closer to the 
              long run proportions."
   )
-
+  
   
   ## Weather Scenario ----
   ### Generate initial values ----
@@ -1788,7 +1774,7 @@ server <- function(input, output, session) {
     probMatrix = diag(2),
     validAnswers = FALSE
   )
-
+  
   observeEvent(
     eventExpr = input$newWeather,
     handlerExpr = {
@@ -1804,7 +1790,7 @@ server <- function(input, output, session) {
     ignoreNULL = FALSE,
     ignoreInit = FALSE
   )
-
+  
   ### Display scenario text ----
   # Set up text for the weather problem
   output$weatherProb <- renderUI(
@@ -1821,7 +1807,7 @@ server <- function(input, output, session) {
       )
     }
   )
-
+  
   ### Check answers ----
   observeEvent(
     eventExpr = input$checkWeather,
@@ -1915,11 +1901,11 @@ server <- function(input, output, session) {
     ignoreNULL = TRUE,
     ignoreInit = FALSE
   )
-
+  
   ### Hide answers when inputs change ----
   observeEvent(
-    eventExpr = c(input$tomorrowProb1, input$weekProb1,
-                  input$monthProb1, input$yearProb1),
+    eventExpr = c(input$tomorrowProb1, input$weekProb1, input$monthProb1,
+                  input$yearProb1, input$newWeather),
     handlerExpr = {
       if (weatherValues$validAnswers) {
         output$correctnessW1 <- renderIcon()
@@ -1931,7 +1917,7 @@ server <- function(input, output, session) {
     ignoreNULL = TRUE,
     ignoreInit = TRUE
   )
-
+  
   ### Reset answers on new problem ----
   observeEvent(
     eventExpr = input$newWeather,
@@ -1958,7 +1944,7 @@ server <- function(input, output, session) {
       )
     }
   )
-
+  
   ### Create data for plots ----
   weatherData <- eventReactive(
     eventExpr = c(input$newWeatherPlotSamples, weatherValues$probRain),
@@ -1978,11 +1964,11 @@ server <- function(input, output, session) {
       intData$cRain <- cumsum(intData$state == 1)
       intData$cRainProp <- intData$cRain / (intData$day + 1)
       intData$cNoRainProp <- 1 - intData$cRainProp
-
+      
       intData
     }
   )
-
+  
   ### Display plots ----
   output$weatherMonth <- renderPlot(
     expr = {
@@ -2009,7 +1995,7 @@ server <- function(input, output, session) {
     alt = "This plot shows the weather for one month of samples drawn from
            the chain in the problem."
   )
-
+  
   output$weatherYear <- renderPlot(
     expr = {
       ggplot(
@@ -2074,7 +2060,7 @@ server <- function(input, output, session) {
   )
   
 }
-  
+
 
 # Boast app call ----
 boastUtils::boastApp(ui = ui, server = server)
