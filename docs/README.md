@@ -1,4 +1,4 @@
-# MC Convergence
+# Convergence of Discrete-Time Markov Chains
 
 ![experimental](https://img.shields.io/badge/lifecycle-experimental-orange)
 ![year](https://img.shields.io/badge/year-2020-lightgrey)
@@ -6,5 +6,6 @@
 
 ![App Screenshot](/docs/screenshot.png)
 
-c("This app explores discrete time Markov Chains and their long run behavior",
-  "by considering multiple sample problems."
+# App Description
+  This app explores discrete time Markov Chains and their long run behavior by considering multiple sample problems.
+
